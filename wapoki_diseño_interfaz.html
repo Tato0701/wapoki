@@ -16,47 +16,47 @@
             <img src="Imagenes/logo_fondo_claro.png" alt="Logo Wapoki" class="h-10 w-10 rounded-full object-cover bg-gray-200" loading="lazy">
             <span class="text-3xl font-bold text-orange-500 truncate">Wapoki</span>
         </a>
-        <!-- Menú principal, será visible solo en pantallas medianas y grandes -->
+        <!-- Menú principal, para pantallas medianas y grandes -->
         <nav class="hidden md:flex space-x-6 items-center" role="navigation" aria-label="Navegación principal">
             <a href="#quienes-somos" class="text-gray-600 hover:text-orange-500 transition duration-300">¿Quiénes somos?</a>
             <a href="#objetivos" class="text-gray-600 hover:text-orange-500 transition duration-300">Objetivos</a>
             <a href="#servicios" class="text-gray-600 hover:text-orange-500 transition duration-300">Servicios</a>
             <a href="#contacto-footer" class="text-gray-600 hover:text-orange-500 transition duration-300">Contacto</a>
         </nav>
-        <!-- Botones, será visible solo en pantallas medianas y grandes -->
+        <!-- Botones, visibles en pantallas medianas y grandes -->
         <div class="hidden md:flex space-x-3 items-center">
             <a href="#" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300" aria-label="Iniciar sesión">Iniciar sesión</a>
             <a href="#" class="border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white font-semibold py-2 px-4 rounded-lg transition duration-300" aria-label="Registrarse">Registrarse</a>
         </div>
-        <!-- Botón menú, será visible solo en pantallas pequeñas (aún no funciona)-->
+        <!-- Botón menú, visible en pantallas pequeñas -->
         <div class="md:hidden flex-shrink-0">
-            <button id="mobile-menu-button" class="text-gray-600 hover:text-orange-500 focus:outline-none" aria-label="Abrir menú móvil" aria-controls="mobile-menu" aria-expanded="false">
+            <button id="mobile-menu-button" class="text-gray-600 hover:text-orange-500 focus:outline-none" aria-label="Abrir menú" aria-controls="mobile-menu" aria-expanded="false">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
                 </svg>
             </button>
         </div>
     </div>
-    <!-- Menú móvil solo en móvil -->
-    <div id="mobile-menu" class="md:hidden hidden bg-white shadow-lg" role="menu" aria-label="Menú móvil">
+    <!-- Menú principal, para pantallas pequeñas -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white shadow-lg" role="menu" aria-label="Menú">
         <a href="#quienes-somos" class="block px-6 py-3 text-gray-600 hover:bg-orange-50 hover:text-orange-500 transition duration-300" role="menuitem">¿Quiénes somos?</a>
         <a href="#objetivos" class="block px-6 py-3 text-gray-600 hover:bg-orange-50 hover:text-orange-500 transition duration-300" role="menuitem">Objetivos</a>
         <a href="#servicios" class="block px-6 py-3 text-gray-600 hover:bg-orange-50 hover:text-orange-500 transition duration-300" role="menuitem">Servicios</a>
         <a href="#contacto-footer" class="block px-6 py-3 text-gray-600 hover:bg-orange-50 hover:text-orange-500 transition duration-300" role="menuitem">Contacto</a>
         <div class="px-6 py-3 border-t border-gray-200">
-            <a href="#" class="block w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 mb-2" aria-label="Iniciar sesión móvil">Iniciar sesión</a>
-            <a href="#" class="block w-full text-center border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white font-semibold py-2 px-4 rounded-lg transition duration-300" aria-label="Registrarse móvil">Registrarse</a>
+            <a href="#" class="block w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 mb-2" aria-label="Iniciar sesión">Iniciar sesión</a>
+            <a href="#" class="block w-full text-center border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white font-semibold py-2 px-4 rounded-lg transition duration-300" aria-label="Registrarse">Registrarse</a>
         </div>
     </div>
     </header>
 
     <main>
         <section class="hero-section-diagonal" aria-label="Imágenes de mascotas destacadas">
-            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/perro.jpg');" aria-label="Perro feliz"></div>
-            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/gato.jpg');" aria-label="Gato curioso"></div>
-            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/hamster.jpg');" aria-label="Hámster activo"></div>
-            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/conejo.jpg');" aria-label="Conejo tierno"></div>
-            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/perro_2.jpg');" aria-label="Perro juguetón"></div>
+            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/perro.jpg');" aria-label="Perro"></div>
+            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/gato.jpg');" aria-label="Gato"></div>
+            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/hamster.jpg');" aria-label="Hámster"></div>
+            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/conejo.jpg');" aria-label="Conejo"></div>
+            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/perro_2.jpg');" aria-label="Perro"></div>
         </section>
 
         <section id="quienes-somos" class="py-16 bg-white">
@@ -65,7 +65,7 @@
                     Bienvenido a <span class="gradient-text">Wapoki</span>
                 </h1>
                 <p class="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
-                    En Wapoki, amamos a los animales tanto como tú. Somos un equipo de profesionales dedicados al cuidado integral de tus mascotas, ofreciendo servicios veterinarios de la más alta calidad en un ambiente cálido y amigable.
+                    En Wapoki, amamos a los animales tanto como tú. Somos un equipo de profesionales dedicados al cuidado de tus mascotas, ofreciendo servicios veterinarios en un ambiente cálido y amigable.
                 </p>
                 <div class="grid md:grid-cols-2 gap-8 items-center">
                     <div class="text-left">
@@ -79,7 +79,7 @@
                         </p>
                     </div>
                     <div>
-                        <img src="Imagenes/equipo.jpg" alt="Equipo veterinario de Wapoki" class="rounded-lg shadow-xl mx-auto w-64 h-64 object-cover" loading="lazy">
+                        <img src="Imagenes/equipo.jpg" alt="Equipo veterinario Wapoki" class="rounded-lg shadow-xl mx-auto w-64 h-64 object-cover" loading="lazy">
                     </div>
                 </div>
             </div>
@@ -144,7 +144,7 @@
                             <i class="fas fa-dog fa-3x" aria-hidden="true"></i>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-700 mb-2">Peluquería y Spa</h3>
-                        <p class="text-gray-600 text-sm">Servicios de grooming para que tu mascota luzca y se sienta genial.</p>
+                        <p class="text-gray-600 text-sm">Servicios para que tu mascota luzca y se sienta genial.</p>
                     </div>
                 </div>
             </div>
@@ -155,12 +155,12 @@
                 <h2 class="text-3xl font-bold text-center text-orange-600 mb-10">Lo que Dicen Nuestros Clientes</h2>
                 <div class="grid md:grid-cols-2 gap-8">
                     <div class="bg-white p-8 rounded-lg shadow-lg">
-                        <p class="text-gray-600 italic mb-4">"El equipo de Wapoki trató a mi perro Rocky con tanto cariño y profesionalismo. ¡Estamos muy agradecidos por su excelente atención!"</p>
-                        <p class="text-gray-800 font-semibold">- Ana Pérez y Rocky</p>
+                        <p class="text-gray-600 italic mb-4">"La veterinaria Wapoki atendió a mi perro Buñuelo con mucho cariño y profesionalismo. ¡Estamos muy agradecidos por su excelente atención!"</p>
+                        <p class="text-gray-800 font-semibold">- Tatiana y Buñuelo</p>
                     </div>
                     <div class="bg-white p-8 rounded-lg shadow-lg">
-                        <p class="text-gray-600 italic mb-4">"Desde que descubrí Wapoki, mis gatos están más sanos y felices. Sus servicios son de primera y el personal es increíblemente amable."</p>
-                        <p class="text-gray-800 font-semibold">- Carlos Gómez, Michi y Luna</p>
+                        <p class="text-gray-600 italic mb-4">"Wapoki es mi veterinaria de confianza, mis gatos están más sanos y felices. Sus servicios son de primera y el personal es increíblemente amable."</p>
+                        <p class="text-gray-800 font-semibold">- Carlos, Michoso y Oreo</p>
                     </div>
                 </div>
             </div>
@@ -195,15 +195,15 @@
                     <ul class="space-y-2 text-sm">
                         <li>
                             <i class="fas fa-phone-alt mr-2 text-orange-400" aria-hidden="true"></i>
-                            <a href="tel:+573145772885" class="hover:text-orange-400">314 577 2885</a>
+                            <a href="tel:+573143772885" class="hover:text-orange-400">314 377 2885</a>
                         </li>
                         <li>
                             <i class="fas fa-envelope mr-2 text-orange-400" aria-hidden="true"></i>
-                            <a href="mailto:contacto@wapoki.com" class="hover:text-orange-400">contacto@wapoki.com</a>
+                            <a href="mailto:tatianquina10@gmail.com" class="hover:text-orange-400">tatianquina10@gmail.com</a>
                         </li>
                         <li>
                             <i class="fas fa-map-marker-alt mr-2 text-orange-400" aria-hidden="true"></i>
-                            Bogotá, Colombia (Ingresa tu dirección aquí)
+                            Bogotá, Colombia. Cl. 84 #24 - 78
                         </li>
                     </ul>
                 </div>
@@ -212,22 +212,22 @@
                     <ul class="space-y-2 text-sm">
                         <li>
                             <i class="fab fa-instagram mr-2 text-orange-400" aria-hidden="true"></i>
-                            <a href="#" target="_blank" rel="noopener" class="hover:text-orange-400">@wapokipet</a>
+                            <a href="https://www.instagram.com/_tatiana_pulido_/" target="_blank" rel="noopener" class="hover:text-orange-400">@_tatiana_pulido_</a>
                         </li>
                         <li>
                             <i class="fab fa-facebook-f mr-2 text-orange-400" aria-hidden="true"></i>
-                            <a href="#" target="_blank" rel="noopener" class="hover:text-orange-400">/wapokipet</a>
+                            <a href="https://www.facebook.com/leiidytatiana07/?locale=es_LA" target="_blank" rel="noopener" class="hover:text-orange-400">/wapokipet</a>
                         </li>
                         <li>
                             <i class="fab fa-whatsapp mr-2 text-orange-400" aria-hidden="true"></i>
-                            <a href="https://wa.me/573145772885" target="_blank" rel="noopener" class="hover:text-orange-400">WhatsApp (+57 314 577 2885)</a>
+                            <a href="https://wa.me/573143772885" target="_blank" rel="noopener" class="hover:text-orange-400">WhatsApp (+57 314 377 2885)</a>
                         </li>
                     </ul>
                 </div>
             </div>
             <div class="mt-10 border-t border-gray-600 pt-8 text-center text-sm">
                 <p>&copy; <span id="currentYear"></span> Veterinaria Wapoki. Todos los derechos reservados.</p>
-                <p>Diseñado con <i class="fas fa-heart text-orange-400" aria-hidden="true"></i> por el equipo de desarrollo.</p>
+                <p>Diseñado con <i class="fas fa-heart text-orange-400" aria-hidden="true"></i> por el equipo Wapoki.</p>
             </div>
         </div>
     </footer>
@@ -235,7 +235,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            // Funcionalidad para el menú móvil
+            // Funcionalidad para el menú en pantallas pequeñas
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
 
@@ -249,7 +249,7 @@
             // Actualiza dinámicamente el año en el pie de página
             document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-            // Funcionalidad de scroll suave para los enlaces de navegación interna (anclas)
+            // Funcionalidad de scroll suave para los enlaces de navegación
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     const targetId = this.getAttribute('href');
@@ -265,13 +265,12 @@
                         e.preventDefault();
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
-                    // Cierra el menú móvil si está abierto y se hace clic en un enlace del menú
+                    // Cierra el menú para pantallas pequeñas si está abierto y se hace clic en un enlace del menú
                     if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
                         mobileMenu.classList.add('hidden');
                         mobileMenuButton.setAttribute('aria-expanded', 'false');
                     }
                 });
             });
-            // --- Fin del Script
         });
     </script>
