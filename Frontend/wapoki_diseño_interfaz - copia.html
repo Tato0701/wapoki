@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Adapta la ventana a dispositivos móviles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veterinaria Wapoki</title>
+    <link rel="stylesheet" href="estilos.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <!-- Encabezado de la página -->
+    <header class="bg-white shadow-md sticky top-0 z-50" role="banner">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+        <a href="#" class="flex items-center space-x-3 min-w-0" aria-label="Inicio Wapoki">
+            <img src="Imagenes/logo_fondo_claro.png" alt="Logo Wapoki" class="h-10 w-10 rounded-full object-cover bg-gray-200" loading="lazy">
+            <span class="text-3xl font-bold text-orange-500 truncate">Wapoki</span>
+        </a>
+        <!-- Menú principal, para pantallas medianas y grandes -->
+        <nav class="hidden md:flex space-x-6 items-center" role="navigation" aria-label="Navegación principal">
+            <a href="#quienes-somos" class="text-gray-600 hover:text-orange-500 transition duration-300">¿Quiénes somos?</a>
+            <a href="#objetivos" class="text-gray-600 hover:text-orange-500 transition duration-300">Objetivos</a>
+            <a href="#servicios" class="text-gray-600 hover:text-orange-500 transition duration-300">Servicios</a>
+            <a href="#contacto-footer" class="text-gray-600 hover:text-orange-500 transition duration-300">Contacto</a>
+        </nav>
+        <!-- Botones, visibles en pantallas medianas y grandes -->
+        <div class="hidden md:flex space-x-3 items-center">
+            <a href="#" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300" aria-label="Iniciar sesión">Iniciar sesión</a>
+            <a href="#" class="border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white font-semibold py-2 px-4 rounded-lg transition duration-300" aria-label="Registrarse">Registrarse</a>
+        </div>
+        <!-- Botón menú, visible en pantallas pequeñas -->
+        <div class="md:hidden flex-shrink-0">
+            <button id="mobile-menu-button" class="text-gray-600 hover:text-orange-500 focus:outline-none" aria-label="Abrir menú" aria-controls="mobile-menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <!-- Menú principal, para pantallas pequeñas -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white shadow-lg" role="menu" aria-label="Menú">
+        <a href="#quienes-somos" class="block px-6 py-3 text-gray-600 hover:bg-orange-50 hover:text-orange-500 transition duration-300" role="menuitem">¿Quiénes somos?</a>
+        <a href="#objetivos" class="block px-6 py-3 text-gray-600 hover:bg-orange-50 hover:text-orange-500 transition duration-300" role="menuitem">Objetivos</a>
+        <a href="#servicios" class="block px-6 py-3 text-gray-600 hover:bg-orange-50 hover:text-orange-500 transition duration-300" role="menuitem">Servicios</a>
+        <a href="#contacto-footer" class="block px-6 py-3 text-gray-600 hover:bg-orange-50 hover:text-orange-500 transition duration-300" role="menuitem">Contacto</a>
+        <div class="px-6 py-3 border-t border-gray-200">
+            <a href="#" class="block w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 mb-2" aria-label="Iniciar sesión">Iniciar sesión</a>
+            <a href="#" class="block w-full text-center border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white font-semibold py-2 px-4 rounded-lg transition duration-300" aria-label="Registrarse">Registrarse</a>
+        </div>
+    </div>
+    </header>
+
+    <main>
+        <section class="hero-section-diagonal" aria-label="Imágenes de mascotas destacadas">
+            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/perro.jpg');" aria-label="Perro"></div>
+            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/gato.jpg');" aria-label="Gato"></div>
+            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/hamster.jpg');" aria-label="Hámster"></div>
+            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/conejo.jpg');" aria-label="Conejo"></div>
+            <div class="hero-image-strip-diagonal" style="background-image: url('Imagenes/perro_2.jpg');" aria-label="Perro"></div>
+        </section>
+
+        <section id="quienes-somos" class="py-16 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl font-bold text-gray-800 mb-6">
+                    Bienvenido a <span class="gradient-text">Wapoki</span>
+                </h1>
+                <p class="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
+                    En Wapoki, amamos a los animales tanto como tú. Somos un equipo de profesionales dedicados al cuidado de tus mascotas, ofreciendo servicios veterinarios en un ambiente cálido y amigable.
+                </p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="text-left">
+                        <h2 class="text-2xl font-semibold text-orange-500 mb-4">Nuestra Misión</h2>
+                        <p class="text-gray-600 mb-4">
+                            Proporcionar atención veterinaria excepcional y compasiva, promoviendo la salud y el bienestar de las mascotas y fortaleciendo el vínculo especial que comparten con sus familias. Buscamos ser un referente en Bogotá, conectando veterinarios y facilitando el acceso a historiales clínicos.
+                        </p>
+                        <h2 class="text-2xl font-semibold text-orange-500 mb-4">Nuestra Visión</h2>
+                        <p class="text-gray-600">
+                            Ser la clínica veterinaria líder en innovación y cuidado animal, reconocida por nuestra excelencia profesional, trato ético y compromiso con la comunidad y sus mascotas.
+                        </p>
+                    </div>
+                    <div>
+                        <img src="Imagenes/equipo.jpg" alt="Equipo veterinario Wapoki" class="rounded-lg shadow-xl mx-auto w-64 h-64 object-cover" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="objetivos" class="py-16 bg-orange-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-orange-600 mb-10">Nuestros Objetivos</h2>
+                <div class="grid md:grid-cols-3 gap-8 text-center">
+                    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <div class="text-orange-500 mb-4">
+                            <i class="fas fa-heartbeat fa-3x" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Bienestar Animal</h3>
+                        <p class="text-gray-600">Garantizar la salud y felicidad de cada mascota que nos visita a través de medicina preventiva y tratamientos efectivos.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <div class="text-orange-500 mb-4">
+                            <i class="fas fa-users fa-3x" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Confianza del Cliente</h3>
+                        <p class="text-gray-600">Construir relaciones duraderas con nuestros clientes basadas en la transparencia, comunicación y un servicio excepcional.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <div class="text-orange-500 mb-4">
+                            <i class="fas fa-notes-medical fa-3x" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Historias Clínicas Digitales</h3>
+                        <p class="text-gray-600">Implementar y facilitar el acceso a historiales clínicos digitales para una atención coordinada y eficiente.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="servicios" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">Nuestros Servicios</h2>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+                        <div class="text-orange-500 mb-4">
+                            <i class="fas fa-stethoscope fa-3x" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Consultas Generales</h3>
+                        <p class="text-gray-600 text-sm">Atención médica completa para el diagnóstico y tratamiento de diversas afecciones.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+                        <div class="text-orange-500 mb-4">
+                            <i class="fas fa-syringe fa-3x" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Vacunación</h3>
+                        <p class="text-gray-600 text-sm">Planes de vacunación personalizados para proteger a tu mascota de enfermedades.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+                        <div class="text-orange-500 mb-4">
+                            <i class="fas fa-cut fa-3x" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Cirugías</h3>
+                        <p class="text-gray-600 text-sm">Procedimientos quirúrgicos con equipos modernos y personal cualificado.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+                        <div class="text-orange-500 mb-4">
+                            <i class="fas fa-dog fa-3x" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Peluquería y Spa</h3>
+                        <p class="text-gray-600 text-sm">Servicios para que tu mascota luzca y se sienta genial.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 bg-orange-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center text-orange-600 mb-10">Lo que Dicen Nuestros Clientes</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <p class="text-gray-600 italic mb-4">"La veterinaria Wapoki atendió a mi perro Buñuelo con mucho cariño y profesionalismo. ¡Estamos muy agradecidos por su excelente atención!"</p>
+                        <p class="text-gray-800 font-semibold">- Tatiana y Buñuelo</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <p class="text-gray-600 italic mb-4">"Wapoki es mi veterinaria de confianza, mis gatos están más sanos y felices. Sus servicios son de primera y el personal es increíblemente amable."</p>
+                        <p class="text-gray-800 font-semibold">- Carlos, Michoso y Oreo</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 bg-orange-500">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold text-white mb-6">¿Listo para darle a tu mascota el mejor cuidado?</h2>
+                <p class="text-orange-100 text-lg mb-8 max-w-2xl mx-auto">
+                    Agenda una cita hoy mismo o contáctanos para más información. En Wapoki, tu mascota está en las mejores manos.
+                </p>
+                <a href="#contacto-footer" class="bg-white text-orange-500 font-bold py-3 px-8 rounded-lg hover:bg-orange-100 transition duration-300 text-lg shadow-md">Agendar Cita</a>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contacto-footer" class="bg-gray-700 text-gray-300 py-12" role="contentinfo">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-8 items-start">
+                <div class="mb-6 md:mb-0">
+                    <a href="#" class="flex items-center space-x-3 text-3xl font-bold text-orange-400 mb-4" aria-label="Inicio Wapoki">
+                        <img src="https://placehold.co/40x40/FF8C00/FFFFFF?text=W&font=Inter&bold" alt="Logo Wapoki Footer" class="h-10 w-10 rounded-full" loading="lazy">
+                        <span>Wapoki</span>
+                    </a>
+                    <h4 class="text-xl font-semibold text-white mb-3 mt-2">Sobre Nosotros</h4>
+                    <p class="text-sm">
+                        Buscamos poder conectar todos los veterinarios de Bogotá para empezar a generar historias clínicas para tus mascotas.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-xl font-semibold text-white mb-3">Contactos</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li>
+                            <i class="fas fa-phone-alt mr-2 text-orange-400" aria-hidden="true"></i>
+                            <a href="tel:+573143772885" class="hover:text-orange-400">314 377 2885</a>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope mr-2 text-orange-400" aria-hidden="true"></i>
+                            <a href="mailto:tatianquina10@gmail.com" class="hover:text-orange-400">tatianquina10@gmail.com</a>
+                        </li>
+                        <li>
+                            <i class="fas fa-map-marker-alt mr-2 text-orange-400" aria-hidden="true"></i>
+                            Bogotá, Colombia. Cl. 84 #24 - 78
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xl font-semibold text-white mb-3">Redes Sociales</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li>
+                            <i class="fab fa-instagram mr-2 text-orange-400" aria-hidden="true"></i>
+                            <a href="https://www.instagram.com/_tatiana_pulido_/" target="_blank" rel="noopener" class="hover:text-orange-400">@_tatiana_pulido_</a>
+                        </li>
+                        <li>
+                            <i class="fab fa-facebook-f mr-2 text-orange-400" aria-hidden="true"></i>
+                            <a href="https://www.facebook.com/leiidytatiana07/?locale=es_LA" target="_blank" rel="noopener" class="hover:text-orange-400">/wapokipet</a>
+                        </li>
+                        <li>
+                            <i class="fab fa-whatsapp mr-2 text-orange-400" aria-hidden="true"></i>
+                            <a href="https://wa.me/573143772885" target="_blank" rel="noopener" class="hover:text-orange-400">WhatsApp (+57 314 377 2885)</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-10 border-t border-gray-600 pt-8 text-center text-sm">
+                <p>&copy; <span id="currentYear"></span> Veterinaria Wapoki. Todos los derechos reservados.</p>
+                <p>Diseñado con <i class="fas fa-heart text-orange-400" aria-hidden="true"></i> por el equipo Wapoki.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Funcionalidad para el menú en pantallas pequeñas
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    const expanded = mobileMenu.classList.toggle('hidden') ? 'false' : 'true';
+                    mobileMenuButton.setAttribute('aria-expanded', expanded);
+                });
+            }
+
+            // Actualiza dinámicamente el año en el pie de página
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            // Funcionalidad de scroll suave para los enlaces de navegación
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const targetId = this.getAttribute('href');
+                    if (targetId.length > 1 && targetId !== '#') {
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            e.preventDefault();
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    } else if (targetId === '#') {
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    // Cierra el menú para pantallas pequeñas si está abierto y se hace clic en un enlace del menú
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+        });
+    </script>

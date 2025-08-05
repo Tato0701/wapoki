@@ -73,3 +73,27 @@ body {
     src: url(https://fonts.gstatic.com/s/inter/v19/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');
     unicode-range: U+0000-00FF, U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
 }
+
+/* Animación para modales y elementos que aparecen */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Estilo para el scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #fb923c;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #f97316;
+}
