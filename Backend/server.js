@@ -1,55 +1,131 @@
-// --- Importar los módulos necesarios ---
+// --- Importar módulos ---
+// --- Permite crear un servidor web.
 const express = require('express');
+// --- Permite conectar y trabajar con una base de datos MySQL.
 const mysql = require('mysql2/promise');
+// --- Permite que el servidor acepte peticiones desde otras páginas web.
 const cors = require('cors');
 
 // --- Configuración inicial ---
+// --- Crea una aplicación web con Express.
 const app = express();
+// --- Define el puerto donde funcionará.
 const PORT = process.env.PORT || 3006;
 
-// --- Middlewares ---
+// --- Middlewares --- 
 app.use(cors());
 app.use(express.json());
 
 // --- Configuración de la conexión a la Base de Datos MySQL ---
-// ¡IMPORTANTE! Reemplaza estos valores con tus credenciales de MySQL.
 const dbConfig = {
     host: '127.0.0.1',
     user: 'root',
-    password: 'Tatiana123456', // Cambia esto
-    database: 'wapoki' // El nombre de tu nueva base de datos
+    password: 'Tatiana123456',
+    database: 'wapoki'
 };
 
-// // --- Endpoint para probar la conexión a la base de datos ---
-// app.get('/api/test-db', async (req, res) => {
-//     try {
-//         const [rows] = await pool.query('SELECT 1 AS test');
-//         res.json({ success: true, message: 'Conexión exitosa', result: rows });
-//     } catch (error) {
-//         res.status(500).json({ success: false, message: 'Error de conexión', error: error.message });
-//     }
-// });
-
 // --- Pool de Conexiones a la DB ---
+// --- Permite hacer varias consultas a la base de datos al mismo tiempo.
 const pool = mysql.createPool(dbConfig);
+
+// --- Endpoint de prueba para verificar que el servidor está funcionando ---
+// // --- Endpoint para probar la conexión a la base de datos ---
+app.get('/api/test-db', async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT 1 AS test');
+        res.json({ success: true, message: 'Conexión exitosa', result: rows });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error de conexión', error: error.message });
+    }
+});
 
 // --- Rutas de la API (Endpoints) ---
 
-// OBTENER TODOS LOS CLIENTES (Nuevo Endpoint para el formulario)
+// --- CRUD para Clientes
+
+// OBTENER TODOS LOS CLIENTES
 app.get('/api/clientes', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT id_cliente, nombre, apellido FROM clientes ORDER BY nombre ASC');
+        // Consulta que une las tablas `mascotas` y `clientes`
+        const sql = `
+            SELECT 
+                c.id_cliente, 
+                c.nombre, 
+                c.apellido, 
+                c.telefono, 
+                c.email, 
+                c.direccion, 
+                b.nombre
+            FROM clientes AS c
+            JOIN barrios AS b ON c.id_barrio = b.id_barrio
+            ORDER BY c.id_cliente DESC
+        `;
+        const [rows] = await pool.query(sql);
         res.json(rows);
     } catch (error) {
-        console.error('Error al obtener clientes:', error);
+        console.error('Error al obtener mascotas:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
+// AÑADIR UN NUEVO CLIENTE
+app.post('/api/clientes', async (req, res) => {
+    try {
+        const { nombre, apellido, telefono, email, direccion, id_barrio } = req.body;
+        if (!nombre || !apellido || !telefono || !email || !direccion || !id_barrio) {
+            return res.status(400).json({ error: 'Todos los campos son requeridos' });
+        }
 
-// --- CRUD para Mascotas (Adaptado a la nueva estructura) ---
+        const sql = 'INSERT INTO clientes (nombre, apellido, telefono, email, direccion, barrio) VALUES (?, ?, ?, ?, ?, ?)';
+        const [result] = await pool.query(sql, [nombre, apellido, telefono, email, direccion, id_barrio]);
 
-// OBTENER TODAS LAS MASCOTAS (Read con JOIN)
+        res.status(201).json({ id_cliente: result.insertId, ...req.body });
+    } catch (error) {
+        console.error('Error al añadir cliente:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// ACTUALIZAR UN CLIENTE
+app.put('/api/clientes/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, apellido, telefono, email, direccion, id_barrio } = req.body;
+
+        const sql = 'UPDATE clientes SET nombre = ?, apellido = ?, telefono = ?, email = ?, direccion = ?, id_barrio = ? WHERE id_cliente = ?';
+        const [result] = await pool.query(sql, [nombre, apellido, telefono, email, direccion, id_barrio, id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Cliente no encontrado' });
+        }
+
+        res.json({ message: 'Cliente actualizado correctamente' });
+    } catch (error) {
+        console.error('Error al actualizar cliente:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// ELIMINAR UN CLIENTE
+app.delete('/api/clientes/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [result] = await pool.query('DELETE FROM clientes WHERE id_cliente = ?', [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Cliente no encontrado' });
+        }
+
+        res.json({ message: 'Cliente eliminado correctamente' });
+    } catch (error) {
+        console.error('Error al eliminar cliente:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// --- CRUD para Mascotas
+
+// OBTENER TODAS LAS MASCOTAS
 app.get('/api/mascotas', async (req, res) => {
     try {
         // Consulta que une las tablas `mascotas` y `clientes`
@@ -75,7 +151,7 @@ app.get('/api/mascotas', async (req, res) => {
     }
 });
 
-// AÑADIR UNA NUEVA MASCOTA (Create)
+// AÑADIR UNA NUEVA MASCOTA
 app.post('/api/mascotas', async (req, res) => {
     try {
         const { nombre, especie, raza, edad, peso, id_cliente } = req.body;
@@ -93,7 +169,7 @@ app.post('/api/mascotas', async (req, res) => {
     }
 });
 
-// ACTUALIZAR UNA MASCOTA (Update)
+// ACTUALIZAR UNA MASCOTA
 app.put('/api/mascotas/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -113,7 +189,7 @@ app.put('/api/mascotas/:id', async (req, res) => {
     }
 });
 
-// ELIMINAR UNA MASCOTA (Delete)
+// ELIMINAR UNA MASCOTA
 app.delete('/api/mascotas/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -129,7 +205,6 @@ app.delete('/api/mascotas/:id', async (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
-
 
 // --- Iniciar el servidor ---
 app.listen(PORT, () => {
