@@ -3,11 +3,11 @@
 const express = require('express');
 // --- Permite conectar y trabajar con una base de datos MySQL.
 const mysql = require('mysql2/promise');
-// --- Permite que el servidor acepte peticiones desde otras páginas web.
+// --- Capa seguridad para permitir peticiones a mi api
 const cors = require('cors');
 
 // --- Configuración inicial ---
-// --- Crea una aplicación web con Express.
+// --- APP(Inicializa) express
 const app = express();
 // --- Define el puerto donde funcionará.
 const PORT = process.env.PORT || 3006;
@@ -30,14 +30,14 @@ const pool = mysql.createPool(dbConfig);
 
 // --- Endpoint de prueba para verificar que el servidor está funcionando ---
 // // --- Endpoint para probar la conexión a la base de datos ---
-app.get('/api/test-db', async (req, res) => {
-    try {
-        const [rows] = await pool.query('SELECT 1 AS test');
-        res.json({ success: true, message: 'Conexión exitosa', result: rows });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Error de conexión', error: error.message });
-    }
-});
+// app.get('/api/test-db', async (req, res) => {
+//     try {
+//         const [rows] = await pool.query('SELECT 1 AS test');
+//         res.json({ success: true, message: 'Conexión exitosa', result: rows });
+//     } catch (error) {
+//         res.status(500).json({ success: false, message: 'Error de conexión', error: error.message });
+//     }
+// });
 
 // --- Rutas de la API (Endpoints) ---
 
@@ -55,9 +55,9 @@ app.get('/api/clientes', async (req, res) => {
                 c.telefono, 
                 c.email, 
                 c.direccion, 
-                b.nombre
+                b.nombre AS id_barrio
             FROM clientes AS c
-            JOIN barrios AS b ON c.id_barrio = b.id_barrio
+            LEFT JOIN barrios AS b ON c.id_barrio = b.id_barrio
             ORDER BY c.id_cliente DESC
         `;
         const [rows] = await pool.query(sql);
@@ -75,9 +75,9 @@ app.post('/api/clientes', async (req, res) => {
         if (!nombre || !apellido || !telefono || !email || !direccion || !id_barrio) {
             return res.status(400).json({ error: 'Todos los campos son requeridos' });
         }
-
-        const sql = 'INSERT INTO clientes (nombre, apellido, telefono, email, direccion, barrio) VALUES (?, ?, ?, ?, ?, ?)';
-        const [result] = await pool.query(sql, [nombre, apellido, telefono, email, direccion, id_barrio]);
+        const id_barrio_number = parseInt(id_barrio, 10);
+        const sql = 'INSERT INTO clientes (nombre, apellido, telefono, email, direccion, id_barrio) VALUES (?, ?, ?, ?, ?, ?)';
+        const [result] = await pool.query(sql, [nombre, apellido, telefono, email, direccion, id_barrio_number]);
 
         res.status(201).json({ id_cliente: result.insertId, ...req.body });
     } catch (error) {
@@ -210,3 +210,4 @@ app.delete('/api/mascotas/:id', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://127.0.0.1:${PORT}`);
 });
+ 

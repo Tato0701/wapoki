@@ -17,7 +17,7 @@
     <script type="text/babel">
         // --- Importa funciones de React para manejar datos y actualizaciones.
         const { useState, useEffect, useCallback } = React;
-        const API_URL = 'http://localhost:3001/api';
+        const API_URL = 'http://localhost:3006/api';
 
         // --- MODAL PARA MASCOTAS ---
         const PetModal = ({ pet, clients, onClose, onSave }) => {
@@ -28,12 +28,30 @@
             return (<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4"><div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in"><h2 className="text-2xl font-bold text-gray-800 mb-6">{pet ? 'Editar Mascota' : 'Añadir Nueva Mascota'}</h2><form onSubmit={handleSubmit}><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre de la mascota" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required /><select name="especie" value={formData.especie} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white"><option>Perro</option><option>Gato</option><option>Ave</option><option>Reptil</option><option>Otro</option></select><input type="text" name="raza" value={formData.raza} onChange={handleChange} placeholder="Raza" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required /><input type="number" name="edad" value={formData.edad} onChange={handleChange} placeholder="Edad" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required /><input type="number" step="0.01" name="peso" value={formData.peso} onChange={handleChange} placeholder="Peso (kg)" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required /><select name="id_cliente" value={formData.id_cliente} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white" required><option value="" disabled>-- Seleccione un Dueño --</option>{clients.map(client => (<option key={client.id_cliente} value={client.id_cliente}>{client.nombre} {client.apellido}</option>))}</select></div><div className="flex justify-end space-x-4 mt-8"><button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button><button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Guardar</button></div></form></div></div>);
         };
 
-        // --- MODAL PARA CLIENTES ---
+        // --- MODAL PARA CLIENTES --- CHECK TEMPORAL
         const ClientModal = ({ client, onClose, onSave }) => {
-            const [formData, setFormData] = useState(client || { nombre: '', apellido: '', telefono: '', email: '', direccion: '' });
+            const [formData, setFormData] = useState(client || { nombre: '', apellido: '', telefono: '', email: '', direccion: '', id_barrio: 0 });
             const handleChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
             const handleSubmit = (e) => { e.preventDefault(); const dataToSave = client?.id_cliente ? { ...formData, id_cliente: client.id_cliente } : formData; onSave(dataToSave); };
-            return (<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4"><div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in"><h2 className="text-2xl font-bold text-gray-800 mb-6">{client ? 'Editar Cliente' : 'Añadir Nuevo Cliente'}</h2><form onSubmit={handleSubmit}><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required /><input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Apellido" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required /><input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" /><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" /><input type="text" name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Dirección" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" /></div><div className="flex justify-end space-x-4 mt-8"><button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button><button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Guardar</button></div></form></div></div>);
+            return (<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6">{client ? 'Editar Cliente' : 'Añadir Nuevo Cliente'}</h2>
+                    <form onSubmit={handleSubmit}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                            <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Apellido" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                            <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                            <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Dirección" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                            <input type="number" name="id_barrio" value={formData.id_barrio} onChange={handleChange} placeholder="Barrio" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                        </div>
+                        <div className="flex justify-end space-x-4 mt-8">
+                            <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button>
+                            <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>);
         };
 
         // --- MODAL PARA CITAS ---
@@ -103,10 +121,10 @@
             const fetchAllData = useCallback(async () => {
                 setLoading(true);
                 try {
-                    const responses = await Promise.all([fetch(`${API_URL}/mascotas`), fetch(`${API_URL}/clientes`), fetch(`${API_URL}/citas`), fetch(`${API_URL}/veterinarios`), fetch(`${API_URL}/facturacion`)]);
+                    const responses = await Promise.all([fetch(`${API_URL}/mascotas`), fetch(`${API_URL}/clientes`)]);
                     for (const res of responses) { if (!res.ok) throw new Error('Error al cargar los datos.'); }
-                    const [pets, clients, appointments, vets, bills] = await Promise.all(responses.map(res => res.json()));
-                    setData({ pets, clients, appointments, vets, bills });
+                    const [pets, clients] = await Promise.all(responses.map(res => res.json()));
+                    setData({ pets, clients });
                 } catch (error) { console.error("Error fetching data:", error); alert('No se pudieron cargar los datos.'); }
                 finally { setLoading(false); }
             }, []);
