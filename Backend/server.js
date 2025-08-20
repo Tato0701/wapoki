@@ -762,7 +762,7 @@ app.get('/api/citas', async (req, res) => {
             LEFT JOIN mascotas AS m 
                 ON c.id_mascota = m.id_mascota
             LEFT JOIN veterinarios AS v 
-                ON c.veterinario = v.id_veterinario
+                ON c.id_veterinario = v.id_veterinario
             LEFT JOIN clientes AS cl
                 ON m.id_cliente = cl.id_cliente
         `;
@@ -920,84 +920,85 @@ app.delete('/api/tratamientos/:id', async (req, res) => {
 });
 
 // ------------------------------
-// --- CRUD para facturas
+// --- CRUD para facturacion
 // ------------------------------
 
 // OBTENER TODAS LAS FACTURAS
-app.get('/api/facturas', async (req, res) => {
+app.get('/api/facturacion', async (req, res) => {
     try {
         const sql = `
             SELECT 
+                f.id_factura,
                 f.fecha_emision,
                 f.total,
                 f.metodo_pago,
                 c.nombre AS nombre_cliente,
                 m.nombre AS nombre_mascota
-            FROM facturas AS f
+            FROM facturacion AS f
             LEFT JOIN clientes AS c 
                 ON f.id_cliente = c.id_cliente
             LEFT JOIN mascotas AS m 
-                ON f.id_mascota = m.id_mascota
+                ON c.id_cliente = m.id_cliente
         `;
         const [rows] = await pool.query(sql);
         res.json(rows);
     } catch (error) {
-        console.error('Error al obtener facturas:', error);
+        console.error('Error al obtener facturacion:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
-// AÑADIR UNA NUEVA FACTURA
-app.post('/api/facturas', async (req, res) => {
+// AÑADIR UNA NUEVA FACTURACION
+app.post('/api/facturacion', async (req, res) => {
     try {
         const { fecha_emision, total, metodo_pago, id_cliente } = req.body;
         if (!fecha_emision || !total || !metodo_pago || !id_cliente) {
             return res.status(400).json({ error: 'Todos los campos son requeridos' });
         }
 
-        const sql = 'INSERT INTO facturas (fecha_emision, total, metodo_pago, id_cliente) VALUES (?, ?, ?, ?)';
+        const sql = 'INSERT INTO facturacion (fecha_emision, total, metodo_pago, id_cliente) VALUES (?, ?, ?, ?)';
         const [result] = await pool.query(sql, [fecha_emision, total, metodo_pago, id_cliente]);
 
         res.status(201).json({ id_factura: result.insertId, ...req.body });
     } catch (error) {
-        console.error('Error al añadir factura:', error);
+        console.error('Error al añadir facturacion:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
-// ACTUALIZAR UNA FACTURA
-app.put('/api/facturas/:id', async (req, res) => {
+// ACTUALIZAR UNA FACTURACION
+app.put('/api/facturacion/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { fecha_emision, total, metodo_pago, id_cliente } = req.body;
 
-        const sql = 'UPDATE facturas SET fecha_emision = ?, total = ?, metodo_pago = ?, id_cliente = ? WHERE id_factura = ?';
+        const sql = 'UPDATE facturacion SET fecha_emision = ?, total = ?, metodo_pago = ?, id_cliente = ? WHERE id_factura = ?';
         const [result] = await pool.query(sql, [fecha_emision, total, metodo_pago, id_cliente, id]);
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Factura no encontrada' });
+            return res.status(404).json({ error: 'Facturacion no encontrada' });
         }
 
-        res.json({ message: 'Factura actualizada correctamente' });
+        res.json({ message: 'Facturacion actualizada correctamente' });
     } catch (error) {
-        console.error('Error al actualizar factura:', error);
+        console.error('Error al actualizar facturacion:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
-// ELIMINAR UNA FACTURA
-app.delete('/api/facturas/:id', async (req, res) => {
+// ELIMINAR UNA FACTURACION
+app.delete('/api/facturacion/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const [result] = await pool.query('DELETE FROM facturas WHERE id_factura = ?', [id]);
+        const [result] = await pool.query('DELETE FROM facturacion WHERE id_factura = ?', [id]);
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Factura no encontrada' });
+            return res.status(404).json({ error: 'Facturacion no encontrada' });
         }
 
-        res.json({ message: 'Factura eliminada correctamente' });
+        res.json({ message: 'Facturacion eliminada correctamente' });
     } catch (error) {
-        console.error('Error al eliminar factura:', error);
+        console.error('Error al eliminar facturacion:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
@@ -1011,23 +1012,24 @@ app.get('/api/detalles_facturas', async (req, res) => {
     try {
         const sql = `
             SELECT 
+                df.id_detalle AS id_detalle_factura,
                 f.fecha_emision,
                 c.nombre AS nombre_cliente,
                 m.nombre AS nombre_mascota,
-                df.servicio AS nombre_servicio,
+                s.nombre AS nombre_servicio,
                 df.cantidad AS cantidad_servicio,
                 df.subtotal AS subtotal_servicio,
                 f.total AS total_factura,
                 f.metodo_pago AS metodo_pago_factura
             FROM detalle_facturacion AS df
-            LEFT JOIN facturas AS f 
+            LEFT JOIN facturacion AS f 
                 ON f.id_factura = df.id_factura
             LEFT JOIN servicios AS s
                 ON df.id_servicio = s.id_servicio
             LEFT JOIN clientes AS c 
                 ON f.id_cliente = c.id_cliente
             LEFT JOIN mascotas AS m 
-                ON f.id_mascota = m.id_mascota
+                ON f.id_cliente = m.id_cliente
         `;
         const [rows] = await pool.query(sql);
         res.json(rows);
@@ -1061,7 +1063,7 @@ app.put('/api/detalles_facturas/:id', async (req, res) => {
         const { id } = req.params;
         const { id_factura, id_servicio, cantidad, subtotal } = req.body;
 
-        const sql = 'UPDATE detalle_facturacion SET id_factura = ?, id_servicio = ?, cantidad = ?, subtotal = ? WHERE id_detalle_factura = ?';
+        const sql = 'UPDATE detalle_facturacion SET id_factura = ?, id_servicio = ?, cantidad = ?, subtotal = ? WHERE id_detalle = ?';
         const [result] = await pool.query(sql, [id_factura, id_servicio, cantidad, subtotal, id]);
 
         if (result.affectedRows === 0) {
@@ -1079,7 +1081,7 @@ app.put('/api/detalles_facturas/:id', async (req, res) => {
 app.delete('/api/detalles_facturas/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const [result] = await pool.query('DELETE FROM detalle_facturacion WHERE id_detalle_factura = ?', [id]);
+        const [result] = await pool.query('DELETE FROM detalle_facturacion WHERE id_detalle = ?', [id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Detalle de factura no encontrado' });

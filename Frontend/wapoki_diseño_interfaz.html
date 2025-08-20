@@ -19,112 +19,1818 @@
         const { useState, useEffect, useCallback } = React;
         const API_URL = 'http://localhost:3006/api';
 
-        // --- MODAL PARA MASCOTAS ---
+        //-----------------------------------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------------------------------
+
+        // ----------------------------
+        // MODAL PARA MASCOTAS
+        // ----------------------------
+
         const PetModal = ({ pet, clients, onClose, onSave }) => {
-            const [formData, setFormData] = useState({ nombre: pet?.nombre || '', especie: pet?.especie || '', raza: pet?.raza || '', edad: pet?.edad || '', peso: pet?.peso || '', id_cliente: pet?.id_cliente || (clients.length > 0 ? clients[0].id_cliente : '') });
-            useEffect(() => { if (!formData.id_cliente && clients.length > 0) setFormData(prev => ({ ...prev, id_cliente: clients[0].id_cliente })); }, [clients, formData.id_cliente]);
-            const handleChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
-            const handleSubmit = (e) => { e.preventDefault(); const dataToSave = pet?.id_mascota ? { ...formData, id_mascota: pet.id_mascota } : formData; onSave(dataToSave); };
-            return (<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4"><div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in"><h2 className="text-2xl font-bold text-gray-800 mb-6">{pet ? 'Editar Mascota' : 'Añadir Nueva Mascota'}</h2><form onSubmit={handleSubmit}><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre de la mascota" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required /><select name="especie" value={formData.especie} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white"><option>Perro</option><option>Gato</option><option>Ave</option><option>Reptil</option><option>Otro</option></select><input type="text" name="raza" value={formData.raza} onChange={handleChange} placeholder="Raza" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required /><input type="number" name="edad" value={formData.edad} onChange={handleChange} placeholder="Edad" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required /><input type="number" step="0.01" name="peso" value={formData.peso} onChange={handleChange} placeholder="Peso (kg)" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required /><select name="id_cliente" value={formData.id_cliente} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white" required><option value="" disabled>-- Seleccione un Dueño --</option>{clients.map(client => (<option key={client.id_cliente} value={client.id_cliente}>{client.nombre} {client.apellido}</option>))}</select></div><div className="flex justify-end space-x-4 mt-8"><button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button><button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Guardar</button></div></form></div></div>);
-        };
-
-        // --- MODAL PARA CLIENTES --- CHECK TEMPORAL
-        const ClientModal = ({ client, onClose, onSave }) => {
-            const [formData, setFormData] = useState(client || { nombre: '', apellido: '', telefono: '', email: '', direccion: '', id_barrio: 0 });
-            const handleChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
-            const handleSubmit = (e) => { e.preventDefault(); const dataToSave = client?.id_cliente ? { ...formData, id_cliente: client.id_cliente } : formData; onSave(dataToSave); };
-            return (<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-                <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-6">{client ? 'Editar Cliente' : 'Añadir Nuevo Cliente'}</h2>
-                    <form onSubmit={handleSubmit}>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
-                            <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Apellido" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
-                            <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" />
-                            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" />
-                            <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Dirección" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" />
-                            <input type="number" name="id_barrio" value={formData.id_barrio} onChange={handleChange} placeholder="Barrio" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" />
-                        </div>
-                        <div className="flex justify-end space-x-4 mt-8">
-                            <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button>
-                            <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Guardar</button>
-                        </div>
-                    </form>
-                </div>
-            </div>);
-        };
-
-        // --- MODAL PARA CITAS ---
-        const AppointmentModal = ({ appointment, pets, vets, onClose, onSave }) => {
             const [formData, setFormData] = useState({
-                fecha: appointment?.fecha ? new Date(appointment.fecha).toISOString().split('T')[0] : '',
-                hora: appointment?.hora || '',
-                id_mascota: appointment?.id_mascota || (pets.length > 0 ? pets[0].id_mascota : ''),
-                id_veterinario: appointment?.id_veterinario || (vets.length > 0 ? vets[0].id_veterinario : ''),
-                motivo: appointment?.motivo || ''
+                nombre: pet?.nombre || '',
+                especie: pet?.especie || '',
+                raza: pet?.raza || '',
+                edad: pet?.edad || '',
+                peso: pet?.peso || '',
+                id_cliente: pet?.id_cliente || ''
             });
-            const handleChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
-            const handleSubmit = (e) => { e.preventDefault(); const dataToSave = appointment?.id_cita ? { ...formData, id_cita: appointment.id_cita } : formData; onSave(dataToSave); };
-            return (<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4"><div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in"><h2 className="text-2xl font-bold text-gray-800 mb-6">{appointment ? 'Editar Cita' : 'Agendar Nueva Cita'}</h2><form onSubmit={handleSubmit}><div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="date" name="fecha" value={formData.fecha} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
-                <input type="time" name="hora" value={formData.hora} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
-                <select name="id_mascota" value={formData.id_mascota} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white" required><option value="" disabled>-- Seleccione una Mascota --</option>{pets.map(pet => (<option key={pet.id_mascota} value={pet.id_mascota}>{pet.nombre} ({pet.nombre_cliente})</option>))}</select>
-                <select name="id_veterinario" value={formData.id_veterinario} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white" required><option value="" disabled>-- Seleccione un Veterinario --</option>{vets.map(vet => (<option key={vet.id_veterinario} value={vet.id_veterinario}>{vet.nombre} {vet.apellido}</option>))}</select>
-                <textarea name="motivo" value={formData.motivo} onChange={handleChange} placeholder="Motivo de la consulta" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" rows="3" required></textarea>
-            </div><div className="flex justify-end space-x-4 mt-8"><button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button><button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Guardar</button></div></form></div></div>);
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = pet?.id_mascota
+                    ? { ...formData, id_mascota: pet.id_mascota }
+                    : formData;
+                onSave(dataToSave);
+            };
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{pet ? 'Editar Mascota' : 'Añadir Nueva Mascota'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre de la mascota" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <select name="especie" value={formData.especie} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white">
+                                    <option value="" disabled> Especie </option>
+                                    <option value="Perro">Perro</option>
+                                    <option value="Gato">Gato</option>
+                                    <option value="Ave">Ave</option>
+                                    <option value="Reptil">Reptil</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <input type="text" name="raza" value={formData.raza} onChange={handleChange} placeholder="Raza" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <input type="number" name="edad" value={formData.edad} onChange={handleChange} placeholder="Edad" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <input type="number" step="0.01" name="peso" value={formData.peso} onChange={handleChange} placeholder="Peso (kg)" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <select name="id_cliente" value={formData.id_cliente} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white" required>
+                                    <option value="" disabled> Seleccione un Dueño </option>
+                                    {clients.map(client => (
+                                        <option key={client.id_cliente} value={client.id_cliente}>
+                                            {client.nombre} {client.apellido}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
         };
 
-        // --- PÁGINA DE GESTIÓN DE MASCOTAS ---
+        // ---------------------------------
+        // PÁGINA DE GESTIÓN DE MASCOTAS
+        // ---------------------------------
+
         const PetsPage = ({ data, onSave, onDelete }) => {
             const { pets, clients } = data;
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [editingPet, setEditingPet] = useState(null);
             const [searchTerm, setSearchTerm] = useState('');
             const filteredPets = pets.filter(pet => Object.values(pet).some(value => String(value).toLowerCase().includes(searchTerm.toLowerCase())));
-            return (<div>{isModalOpen && <PetModal pet={editingPet} clients={clients} onClose={() => { setIsModalOpen(false); setEditingPet(null); }} onSave={onSave} />}<header className="mb-8"><h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Mascotas</h1></header><div className="bg-white p-6 rounded-lg shadow-md"><div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4"><div className="relative w-full md:w-1/3"><i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" placeholder="Buscar mascota, dueño..." className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div><button onClick={() => { setEditingPet(null); setIsModalOpen(true); }} className="w-full md:w-auto bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2"><i className="fas fa-plus"></i><span>Añadir Mascota</span></button></div><div className="overflow-x-auto"><table className="w-full text-left"><thead className="bg-gray-50 border-b"><tr><th className="p-4 font-semibold text-gray-600">Mascota</th><th className="p-4 font-semibold text-gray-600">Especie</th><th className="p-4 font-semibold text-gray-600">Dueño</th><th className="p-4 font-semibold text-gray-600 text-center">Peso (kg)</th><th className="p-4 font-semibold text-gray-600 text-center">Acciones</th></tr></thead><tbody>{filteredPets.map(pet => (<tr key={pet.id_mascota} className="border-b hover:bg-gray-50"><td className="p-4"><div className="font-semibold text-gray-800">{pet.nombre}</div><div className="text-sm text-gray-500">{pet.raza} - {pet.edad} años</div></td><td className="p-4 text-gray-700">{pet.especie}</td><td className="p-4 text-gray-700">{pet.nombre_cliente}</td><td className="p-4 text-gray-700 text-center">{pet.peso}</td><td className="p-4 text-center"><button onClick={() => { setEditingPet(pet); setIsModalOpen(true); }} className="text-blue-500 hover:text-blue-700 p-2" title="Editar"><i className="fas fa-edit fa-lg"></i></button><button onClick={() => onDelete(pet.id_mascota)} className="text-red-500 hover:text-red-700 p-2" title="Eliminar"><i className="fas fa-trash-alt fa-lg"></i></button></td></tr>))}</tbody></table></div>{filteredPets.length === 0 && (<div className="text-center py-10 text-gray-500"><i className="fas fa-paw fa-3x mb-4"></i><p className="font-semibold">No se encontraron mascotas</p></div>)}</div></div>);
+            return (
+                <div>
+                    {isModalOpen && <PetModal pet={editingPet} clients={clients} onClose={() => { setIsModalOpen(false); setEditingPet(null); }} onSave={onSave} />}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Mascotas</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" placeholder="Buscar mascota, dueño..." className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                            </div>
+                            <button onClick={() => { setEditingPet(null); setIsModalOpen(true); }} className="w-full md:w-auto bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2">
+                                <i className="fas fa-plus"></i>
+                                <span>Añadir Mascota</span>
+                            </button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-50 border-b">
+                                    <tr>
+                                        <th className="p-4 font-semibold text-gray-600">Mascota</th>
+                                        <th className="p-4 font-semibold text-gray-600">Especie</th>
+                                        <th className="p-4 font-semibold text-gray-600">Dueño</th>
+                                        <th className="p-4 font-semibold text-gray-600 text-center">Peso (kg)</th>
+                                        <th className="p-4 font-semibold text-gray-600 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredPets.map(pet => (
+                                        <tr key={pet.id_mascota} className="border-b hover:bg-gray-50">
+                                            <td className="p-4">
+                                                <div className="font-semibold text-gray-800">{pet.nombre}</div>
+                                                <div className="text-sm text-gray-500">{pet.raza} - {pet.edad} años</div>
+                                            </td>
+                                            <td className="p-4 text-gray-700">{pet.especie}</td>
+                                            <td className="p-4 text-gray-700">{pet.nombre_cliente}</td>
+                                            <td className="p-4 text-gray-700 text-center">{pet.peso}</td>
+                                            <td className="p-4 text-center">
+                                                <button onClick={() => { setEditingPet(pet); setIsModalOpen(true); }} className="text-blue-500 hover:text-blue-700 p-2" title="Editar">
+                                                    <i className="fas fa-edit fa-lg"></i>
+                                                </button>
+                                                <button onClick={() => onDelete(pet.id_mascota)} className="text-red-500 hover:text-red-700 p-2" title="Eliminar">
+                                                    <i className="fas fa-trash-alt fa-lg"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {filteredPets.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-paw fa-3x mb-4"></i>
+                                <p className="font-semibold">No se encontraron mascotas</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
         };
 
-        // --- PÁGINA DE GESTIÓN DE CLIENTES ---
+        // ----------------------------
+        // MODAL PARA CLIENTES
+        // ----------------------------
+
+        const ClientModal = ({ client, onClose, onSave }) => {
+            const [formData, setFormData] = useState(client || { nombre: '', apellido: '', telefono: '', email: '', direccion: '', id_barrio: '' });
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = client?.id_cliente ? { ...formData, id_cliente: client.id_cliente } : formData;
+                onSave(dataToSave);
+            };
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{client ? 'Editar Cliente' : 'Añadir Nuevo Cliente'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Apellido" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                                <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Dirección" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                                <input type="number" name="id_barrio" value={formData.id_barrio} onChange={handleChange} placeholder="Barrio" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                            </div>
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ---------------------------------
+        // PÁGINA DE GESTIÓN DE CLIENTES
+        // ---------------------------------
+
         const ClientsPage = ({ data, onSave, onDelete }) => {
             const { clients } = data;
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [editingClient, setEditingClient] = useState(null);
             const [searchTerm, setSearchTerm] = useState('');
             const filteredClients = clients.filter(client => Object.values(client).some(value => String(value).toLowerCase().includes(searchTerm.toLowerCase())));
-            return (<div>{isModalOpen && <ClientModal client={editingClient} onClose={() => { setIsModalOpen(false); setEditingClient(null); }} onSave={onSave} />}<header className="mb-8"><h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Clientes</h1></header><div className="bg-white p-6 rounded-lg shadow-md"><div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4"><div className="relative w-full md:w-1/3"><i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" placeholder="Buscar por nombre, email, teléfono..." className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div><button onClick={() => { setEditingClient(null); setIsModalOpen(true); }} className="w-full md:w-auto bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2"><i className="fas fa-plus"></i><span>Añadir Cliente</span></button></div><div className="overflow-x-auto"><table className="w-full text-left"><thead className="bg-gray-50 border-b"><tr><th className="p-4 font-semibold text-gray-600">Nombre</th><th className="p-4 font-semibold text-gray-600">Contacto</th><th className="p-4 font-semibold text-gray-600">Dirección</th><th className="p-4 font-semibold text-gray-600 text-center">Acciones</th></tr></thead><tbody>{filteredClients.map(client => (<tr key={client.id_cliente} className="border-b hover:bg-gray-50"><td className="p-4"><div className="font-semibold text-gray-800">{client.nombre} {client.apellido}</div></td><td className="p-4"><div className="text-sm text-gray-700">{client.email}</div><div className="text-sm text-gray-500">{client.telefono}</div></td><td className="p-4 text-gray-700">{client.direccion}</td><td className="p-4 text-center"><button onClick={() => { setEditingClient(client); setIsModalOpen(true); }} className="text-blue-500 hover:text-blue-700 p-2" title="Editar"><i className="fas fa-edit fa-lg"></i></button><button onClick={() => onDelete(client.id_cliente)} className="text-red-500 hover:text-red-700 p-2" title="Eliminar"><i className="fas fa-trash-alt fa-lg"></i></button></td></tr>))}</tbody></table></div>{filteredClients.length === 0 && (<div className="text-center py-10 text-gray-500"><i className="fas fa-users fa-3x mb-4"></i><p className="font-semibold">No se encontraron clientes</p></div>)}</div></div>);
+
+            return (
+                <div>
+                    {isModalOpen && <ClientModal client={editingClient} onClose={() => { setIsModalOpen(false); setEditingClient(null); }} onSave={onSave} />}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Clientes</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" placeholder="Buscar por nombre, email, teléfono..." className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                            </div>
+                            <button onClick={() => { setEditingClient(null); setIsModalOpen(true); }} className="w-full md:w-auto bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2">
+                                <i className="fas fa-plus"></i>
+                                <span>Añadir Cliente</span>
+                            </button></div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-50 border-b">
+                                    <tr>
+                                        <th className="p-4 font-semibold text-gray-600">Nombre</th>
+                                        <th className="p-4 font-semibold text-gray-600">Contacto</th>
+                                        <th className="p-4 font-semibold text-gray-600">Dirección</th>
+                                        <th className="p-4 font-semibold text-gray-600 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredClients.map(client => (
+                                        <tr key={client.id_cliente} className="border-b hover:bg-gray-50">
+                                            <td className="p-4">
+                                                <div className="font-semibold text-gray-800">{client.nombre} {client.apellido}</div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="text-sm text-gray-700">{client.email}</div>
+                                                <div className="text-sm text-gray-500">{client.telefono}</div>
+                                            </td>
+                                            <td className="p-4 text-gray-700">{client.direccion}</td>
+                                            <td className="p-4 text-center">
+                                                <button onClick={() => { setEditingClient(client); setIsModalOpen(true); }} className="text-blue-500 hover:text-blue-700 p-2" title="Editar">
+                                                    <i className="fas fa-edit fa-lg"></i>
+                                                </button>
+                                                <button onClick={() => onDelete(client.id_cliente)} className="text-red-500 hover:text-red-700 p-2" title="Eliminar">
+                                                    <i className="fas fa-trash-alt fa-lg"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {filteredClients.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-users fa-3x mb-4"></i>
+                                <p className="font-semibold">No se encontraron clientes</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
         };
 
-        // --- PÁGINA DE GESTIÓN DE CITAS ---
+        // ----------------------------
+        // MODAL PARA USUARIOS
+        // ----------------------------
+
+        const UserModal = ({ user, onClose, onSave }) => {
+            const [formData, setFormData] = useState({
+                nombre_usuario: user?.nombre_usuario || '',
+                contrasenia: '', // Por seguridad, no se muestra la contraseña actual
+                nombre: user?.nombre || '',
+                apellido: user?.apellido || '',
+                email: user?.email || '',
+                telefono: user?.telefono || '',
+                rol: user?.rol || ''
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = user?.id_usuario
+                    ? { ...formData, id_usuario: user.id_usuario }
+                    : formData;
+                onSave(dataToSave);
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{user ? 'Editar Usuario' : 'Añadir Nuevo Usuario'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" name="nombre_usuario" value={formData.nombre_usuario} onChange={handleChange} placeholder="Nombre de usuario" className="p-3 border rounded-lg" required />
+                                <input type="password" name="contrasenia" value={formData.contrasenia} onChange={handleChange} placeholder="Contraseña" className="p-3 border rounded-lg" required={!user} />
+                                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 border rounded-lg" required />
+                                <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Apellido" className="p-3 border rounded-lg" required />
+                                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="p-3 border rounded-lg" required />
+                                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 border rounded-lg" required />
+                                <select name="rol" value={formData.rol} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2" required>
+                                    <option value="" disabled> Seleccione un Rol </option>
+                                    <option value="admin">Administrador</option>
+                                    <option value="veterinario">Veterinario</option>
+                                    <option value="recepcionista">Recepcionista</option>
+                                </select>
+                            </div>
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ---------------------------------
+        // PÁGINA DE GESTIÓN DE USUARIOS
+        // ---------------------------------
+
+        const UsersPage = ({ users, onSave, onDelete }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingUser, setEditingUser] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const filteredUsers = users.filter(user =>
+                Object.values(user).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+
+            return (
+                <div>
+                    {isModalOpen && (
+                        <UserModal
+                            user={editingUser}
+                            onClose={() => { setIsModalOpen(false); setEditingUser(null); }}
+                            onSave={onSave}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Usuarios</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar usuario, email, rol..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button
+                                onClick={() => { setEditingUser(null); setIsModalOpen(true); }}
+                                className="w-full md:w-auto bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 flex items-center justify-center space-x-2"
+                            >
+                                <i className="fas fa-plus"></i>
+                                <span>Añadir Usuario</span>
+                            </button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-50 border-b">
+                                    <tr>
+                                        <th className="p-4 font-semibold text-gray-600">Usuario</th>
+                                        <th className="p-4 font-semibold text-gray-600">Nombre</th>
+                                        <th className="p-4 font-semibold text-gray-600">Email</th>
+                                        <th className="p-4 font-semibold text-gray-600">Teléfono</th>
+                                        <th className="p-4 font-semibold text-gray-600">Rol</th>
+                                        <th className="p-4 font-semibold text-gray-600 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredUsers.map(user => (
+                                        <tr key={user.id_usuario} className="border-b hover:bg-gray-50">
+                                            <td className="p-4">{user.nombre_usuario}</td>
+                                            <td className="p-4">{user.nombre} {user.apellido}</td>
+                                            <td className="p-4">{user.email}</td>
+                                            <td className="p-4">{user.telefono}</td>
+                                            <td className="p-4">{user.rol}</td>
+                                            <td className="p-4 text-center">
+                                                <button
+                                                    onClick={() => { setEditingUser(user); setIsModalOpen(true); }}
+                                                    className="text-blue-500 hover:text-blue-700 p-2"
+                                                    title="Editar"
+                                                >
+                                                    <i className="fas fa-edit fa-lg"></i>
+                                                </button>
+                                                <button
+                                                    onClick={() => onDelete(user.id_usuario)}
+                                                    className="text-red-500 hover:text-red-700 p-2"
+                                                    title="Eliminar"
+                                                >
+                                                    <i className="fas fa-trash-alt fa-lg"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {filteredUsers.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-user fa-3x mb-4"></i>
+                                <p className="font-semibold">No se encontraron usuarios</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // ----------------------------
+        // MODAL PARA VETERINARIOS
+        // ----------------------------
+
+        const VetModal = ({ vet, usuarios, onClose, onSave }) => {
+            const [formData, setFormData] = useState({
+                nombre: vet?.nombre || '',
+                apellido: vet?.apellido || '',
+                especialidad: vet?.especialidad || '',
+                telefono: vet?.telefono || '',
+                email: vet?.email || '',
+                id_usuario: vet?.id_usuario || ''
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = vet?.id_veterinario
+                    ? { ...formData, id_veterinario: vet.id_veterinario }
+                    : formData;
+                onSave(dataToSave);
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{vet ? 'Editar Veterinario' : 'Añadir Nuevo Veterinario'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 border rounded-lg" required />
+                                <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Apellido" className="p-3 border rounded-lg" required />
+                                <input type="text" name="especialidad" value={formData.especialidad} onChange={handleChange} placeholder="Especialidad" className="p-3 border rounded-lg" required />
+                                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 border rounded-lg" required />
+                                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="p-3 border rounded-lg" required />
+                                <select name="id_usuario" value={formData.id_usuario} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2" required>
+                                    <option value="" disabled> Seleccione un Usuario </option>
+                                    {usuarios.map(usuario => (
+                                        <option key={usuario.id_usuario} value={usuario.id_usuario}>
+                                            {usuario.nombre_usuario}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ---------------------------------
+        // PÁGINA DE GESTIÓN DE VETERINARIOS
+        // ---------------------------------
+
+        const VetsPage = ({ vets, usuarios, onSave, onDelete }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingVet, setEditingVet] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const filteredVets = vets.filter(vet =>
+                Object.values(vet).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+
+            return (
+                <div>
+                    {isModalOpen && (
+                        <VetModal
+                            vet={editingVet}
+                            usuarios={usuarios}
+                            onClose={() => { setIsModalOpen(false); setEditingVet(null); }}
+                            onSave={onSave}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Veterinarios</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar veterinario, especialidad..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button
+                                onClick={() => { setEditingVet(null); setIsModalOpen(true); }}
+                                className="w-full md:w-auto bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 flex items-center justify-center space-x-2"
+                            >
+                                <i className="fas fa-plus"></i>
+                                <span>Añadir Veterinario</span>
+                            </button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-50 border-b">
+                                    <tr>
+                                        <th className="p-4 font-semibold text-gray-600">Nombre</th>
+                                        <th className="p-4 font-semibold text-gray-600">Especialidad</th>
+                                        <th className="p-4 font-semibold text-gray-600">Teléfono</th>
+                                        <th className="p-4 font-semibold text-gray-600">Email</th>
+                                        <th className="p-4 font-semibold text-gray-600">Usuario</th>
+                                        <th className="p-4 font-semibold text-gray-600 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredVets.map(vet => (
+                                        <tr key={vet.id_veterinario} className="border-b hover:bg-gray-50">
+                                            <td className="p-4">{vet.nombre_veterinario} {vet.apellido_veterinario}</td>
+                                            <td className="p-4">{vet.especialidad_veterinario}</td>
+                                            <td className="p-4">{vet.telefono_veterinario}</td>
+                                            <td className="p-4">{vet.email_veterinario}</td>
+                                            <td className="p-4">{vet.nombre_usuario}</td>
+                                            <td className="p-4 text-center">
+                                                <button
+                                                    onClick={() => { setEditingVet(vet); setIsModalOpen(true); }}
+                                                    className="text-blue-500 hover:text-blue-700 p-2"
+                                                    title="Editar"
+                                                >
+                                                    <i className="fas fa-edit fa-lg"></i>
+                                                </button>
+                                                <button
+                                                    onClick={() => onDelete(vet.id_veterinario)}
+                                                    className="text-red-500 hover:text-red-700 p-2"
+                                                    title="Eliminar"
+                                                >
+                                                    <i className="fas fa-trash-alt fa-lg"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {filteredVets.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-user-md fa-3x mb-4"></i>
+                                <p className="font-semibold">No se encontraron veterinarios</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // ----------------------------
+        // MODAL PARA CITAS
+        // ----------------------------
+
+        const AppointmentModal = ({ appointment, pets, vets, onClose, onSave }) => {
+            const [formData, setFormData] = useState({
+                fecha: appointment?.fecha ? new Date(appointment.fecha).toISOString().split('T')[0] : '',
+                hora: appointment?.hora || '',
+                id_mascota: appointment?.id_mascota || '',
+                id_veterinario: appointment?.id_veterinario || '',
+                motivo: appointment?.motivo || ''
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = appointment?.id_cita
+                    ? { ...formData, id_cita: appointment.id_cita }
+                    : formData;
+                onSave(dataToSave);
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{appointment ? 'Editar Cita' : 'Agendar Nueva Cita'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="date" name="fecha" value={formData.fecha} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <input type="time" name="hora" value={formData.hora} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <select name="id_mascota" value={formData.id_mascota} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white" required>
+                                    <option value="" disabled> Seleccione una Mascota </option>
+                                    {pets.map(pet => (
+                                        <option key={pet.id_mascota} value={pet.id_mascota}>
+                                            {pet.nombre} ({pet.nombre_cliente})
+                                        </option>
+                                    ))}
+                                </select>
+                                <select name="id_veterinario" value={formData.id_veterinario} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white" required>
+                                    <option value="" disabled> Seleccione un Veterinario </option>
+                                    {vets.map(vet => (
+                                        <option key={vet.id_veterinario} value={vet.id_veterinario}>
+                                            {vet.nombre_veterinario} {vet.apellido_veterinario}
+                                        </option>
+                                    ))}
+                                </select>
+                                <textarea name="motivo" value={formData.motivo} onChange={handleChange} placeholder="Motivo de la consulta" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" rows="3" required></textarea>
+                            </div>
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ---------------------------------
+        // PÁGINA DE GESTIÓN DE CITAS
+        // ---------------------------------
+
         const AppointmentsPage = ({ data, onSave, onDelete }) => {
             const { appointments, pets, vets } = data;
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [editingAppointment, setEditingAppointment] = useState(null);
-            return (<div>{isModalOpen && <AppointmentModal appointment={editingAppointment} pets={pets} vets={vets} onClose={() => { setIsModalOpen(false); setEditingAppointment(null); }} onSave={onSave} />}<header className="mb-8"><h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Citas</h1></header><div className="bg-white p-6 rounded-lg shadow-md"><div className="flex justify-end mb-6"><button onClick={() => { setEditingAppointment(null); setIsModalOpen(true); }} className="bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2"><i className="fas fa-plus"></i><span>Agendar Cita</span></button></div><div className="overflow-x-auto"><table className="w-full text-left"><thead className="bg-gray-50 border-b"><tr><th className="p-4 font-semibold text-gray-600">Fecha y Hora</th><th className="p-4 font-semibold text-gray-600">Paciente</th><th className="p-4 font-semibold text-gray-600">Veterinario</th><th className="p-4 font-semibold text-gray-600">Motivo</th><th className="p-4 font-semibold text-gray-600 text-center">Acciones</th></tr></thead><tbody>{appointments.map(appt => (<tr key={appt.id_cita} className="border-b hover:bg-gray-50"><td className="p-4"><div className="font-semibold text-gray-800">{new Date(appt.fecha).toLocaleDateString()}</div><div className="text-sm text-gray-500">{appt.hora}</div></td><td className="p-4"><div className="font-semibold text-gray-800">{appt.nombre_mascota}</div><div className="text-sm text-gray-500">{appt.nombre_cliente}</div></td><td className="p-4 text-gray-700">{appt.nombre_veterinario}</td><td className="p-4 text-gray-700">{appt.motivo}</td><td className="p-4 text-center"><button onClick={() => { setEditingAppointment(appt); setIsModalOpen(true); }} className="text-blue-500 hover:text-blue-700 p-2" title="Editar"><i className="fas fa-edit fa-lg"></i></button><button onClick={() => onDelete(appt.id_cita)} className="text-red-500 hover:text-red-700 p-2" title="Eliminar"><i className="fas fa-trash-alt fa-lg"></i></button></td></tr>))}</tbody></table></div>{appointments.length === 0 && (<div className="text-center py-10 text-gray-500"><i className="fas fa-calendar-check fa-3x mb-4"></i><p className="font-semibold">No hay citas programadas</p></div>)}</div></div>);
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const filteredAppointments = appointments.filter(appt =>
+                Object.values(appt).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+
+            return (
+                <div>
+                    {isModalOpen && (
+                        <AppointmentModal
+                            appointment={editingAppointment}
+                            pets={pets}
+                            vets={vets}
+                            onClose={() => { setIsModalOpen(false); setEditingAppointment(null); }}
+                            onSave={onSave}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Citas</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar cita, mascota, veterinario..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button
+                                onClick={() => { setEditingAppointment(null); setIsModalOpen(true); }}
+                                className="bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 flex items-center justify-center space-x-2"
+                            >
+                                <i className="fas fa-plus"></i>
+                                <span>Agendar Cita</span>
+                            </button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-50 border-b">
+                                    <tr>
+                                        <th className="p-4 font-semibold text-gray-600">Fecha y Hora</th>
+                                        <th className="p-4 font-semibold text-gray-600">Paciente</th>
+                                        <th className="p-4 font-semibold text-gray-600">Veterinario</th>
+                                        <th className="p-4 font-semibold text-gray-600">Motivo</th>
+                                        <th className="p-4 font-semibold text-gray-600 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredAppointments.map(appt => (
+                                        <tr key={appt.id_cita} className="border-b hover:bg-gray-50">
+                                            <td className="p-4">
+                                                <div className="font-semibold text-gray-800">{new Date(appt.fecha).toLocaleDateString()}</div>
+                                                <div className="text-sm text-gray-500">{appt.hora}</div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="font-semibold text-gray-800">{appt.nombre_mascota}</div>
+                                                <div className="text-sm text-gray-500">{appt.nombre_cliente}</div>
+                                            </td>
+                                            <td className="p-4 text-gray-700">{appt.nombre_veterinario}</td>
+                                            <td className="p-4 text-gray-700">{appt.motivo}</td>
+                                            <td className="p-4 text-center">
+                                                <button onClick={() => { setEditingAppointment(appt); setIsModalOpen(true); }} className="text-blue-500 hover:text-blue-700 p-2" title="Editar">
+                                                    <i className="fas fa-edit fa-lg"></i>
+                                                </button>
+                                                <button onClick={() => onDelete(appt.id_cita)} className="text-red-500 hover:text-red-700 p-2" title="Eliminar">
+                                                    <i className="fas fa-trash-alt fa-lg"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {appointments.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-calendar-check fa-3x mb-4"></i>
+                                <p className="font-semibold">No hay citas programadas</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
         };
 
-        // --- PÁGINA DE FACTURACIÓN ---
-        const BillingPage = ({ data }) => {
-            const { bills } = data;
+        // ----------------------------
+        // MODAL PARA FACTURACIÓN
+        // ----------------------------
+
+        const BillingModal = ({ factura, clientes, onClose, onSave }) => {
+            const [formData, setFormData] = useState({
+                fecha_emision: factura?.fecha_emision ? new Date(factura.fecha_emision).toISOString().split('T')[0] : '',
+                total: factura?.total || '',
+                metodo_pago: factura?.metodo_pago || '',
+                id_cliente: factura?.id_cliente || ''
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = factura?.id_factura
+                    ? { ...formData, id_factura: factura.id_factura }
+                    : formData;
+                onSave(dataToSave);
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                            {factura ? 'Editar Factura' : 'Añadir Nueva Factura'}
+                        </h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="date" name="fecha_emision" value={formData.fecha_emision} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <input type="number" name="total" value={formData.total} onChange={handleChange} placeholder="Total" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <select name="metodo_pago" value={formData.metodo_pago} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white" required >
+                                    <option value="" disabled> Método de Pago </option>
+                                    <option value="Efectivo">Efectivo</option>
+                                    <option value="Tarjeta">Tarjeta</option>
+                                    <option value="Transferencia">Transferencia</option>
+                                </select>
+                                <select name="id_cliente" value={formData.id_cliente} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white" required >
+                                    <option value="" disabled> Seleccione un Cliente </option>
+                                    {clientes.map(cliente => (
+                                        <option key={cliente.id_cliente} value={cliente.id_cliente}>
+                                            {cliente.nombre} {cliente.apellido}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ---------------------------------
+        // PÁGINA DE GESTIÓN DE FACTURACIÓN
+        // ---------------------------------
+
+        const BillingPage = ({ data, onSave, onDelete }) => {
+            const { billing, clients } = data;
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingBill, setEditingBill] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const filteredBilling = billing.filter(bill =>
+                Object.values(bill).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+
             const getPaymentMethodStyle = (method) => {
                 const styles = { Efectivo: 'bg-green-100 text-green-800', Tarjeta: 'bg-indigo-100 text-indigo-800', Transferencia: 'bg-sky-100 text-sky-800' };
                 return styles[method] || 'bg-gray-100 text-gray-800';
             };
-            return (<div><header className="mb-8"><h1 className="text-3xl font-bold text-gray-800">Historial de Facturación</h1></header><div className="bg-white p-6 rounded-lg shadow-md"><div className="overflow-x-auto"><table className="w-full text-left"><thead className="bg-gray-50 border-b"><tr><th className="p-4 font-semibold text-gray-600">Factura #</th><th className="p-4 font-semibold text-gray-600">Cliente</th><th className="p-4 font-semibold text-gray-600">Fecha</th><th className="p-4 font-semibold text-gray-600 text-center">Método de Pago</th><th className="p-4 font-semibold text-gray-600 text-right">Total</th></tr></thead><tbody>{bills.map(bill => (<tr key={bill.id_factura} className="border-b hover:bg-gray-50"><td className="p-4 font-mono text-gray-600">{String(bill.id_factura).padStart(5, '0')}</td><td className="p-4 font-semibold text-gray-800">{bill.nombre_cliente}</td><td className="p-4 text-gray-700">{new Date(bill.fecha_emision).toLocaleDateString()}</td><td className="p-4 text-center"><span className={`px-3 py-1 text-sm font-medium rounded-full ${getPaymentMethodStyle(bill.metodo_pago)}`}>{bill.metodo_pago}</span></td><td className="p-4 text-right font-semibold text-gray-800">${new Intl.NumberFormat('es-CO').format(bill.total)}</td></tr>))}</tbody></table></div>{bills.length === 0 && (<div className="text-center py-10 text-gray-500"><i className="fas fa-file-invoice-dollar fa-3x mb-4"></i><p className="font-semibold">No hay facturas emitidas</p></div>)}</div></div>);
+
+            const handleAdd = () => { setEditingBill(null); setIsModalOpen(true); };
+            const handleEdit = (bill) => { setEditingBill(bill); setIsModalOpen(true); };
+            const handleCloseModal = () => { setIsModalOpen(false); setEditingBill(null); };
+
+            return (
+                <div>
+                    {isModalOpen && (
+                        <BillingModal
+                            factura={editingBill}
+                            clientes={clients}
+                            onClose={handleCloseModal}
+                            onSave={(data) => { onSave(data); handleCloseModal(); }}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Historial de Facturación</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar factura, cliente, método de pago..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button
+                                onClick={handleAdd}
+                                className="bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 flex items-center space-x-2"
+                            >
+                                <i className="fas fa-plus"></i>
+                                <span>Añadir Factura</span>
+                            </button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-50 border-b">
+                                    <tr>
+                                        <th className="p-4 font-semibold text-gray-600">Factura #</th>
+                                        <th className="p-4 font-semibold text-gray-600">Cliente</th>
+                                        <th className="p-4 font-semibold text-gray-600">Fecha</th>
+                                        <th className="p-4 font-semibold text-gray-600 text-center">Método de Pago</th>
+                                        <th className="p-4 font-semibold text-gray-600 text-right">Total</th>
+                                        <th className="p-4 font-semibold text-gray-600 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredBilling.map(bill => (
+                                        <tr key={bill.id_factura} className="border-b hover:bg-gray-50">
+                                            <td className="p-4 font-mono text-gray-600">{String(bill.id_factura).padStart(5, '0')}</td>
+                                            <td className="p-4 font-semibold text-gray-800">{bill.nombre_cliente}</td>
+                                            <td className="p-4 text-gray-700">{new Date(bill.fecha_emision).toLocaleDateString()}</td>
+                                            <td className="p-4 text-center">
+                                                <span className={`px-3 py-1 text-sm font-medium rounded-full ${getPaymentMethodStyle(bill.metodo_pago)}`}>{bill.metodo_pago}</span>
+                                            </td>
+                                            <td className="p-4 text-right font-semibold text-gray-800">${new Intl.NumberFormat('es-CO').format(bill.total)}</td>
+                                            <td className="p-4 text-center">
+                                                <button
+                                                    onClick={() => handleEdit(bill)}
+                                                    className="text-blue-500 hover:text-blue-700 p-2"
+                                                    title="Editar"
+                                                >
+                                                    <i className="fas fa-edit fa-lg"></i>
+                                                </button>
+                                                <button
+                                                    onClick={() => onDelete(bill.id_factura)}
+                                                    className="text-red-500 hover:text-red-700 p-2"
+                                                    title="Eliminar"
+                                                >
+                                                    <i className="fas fa-trash-alt fa-lg"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {billing.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-file-invoice-dollar fa-3x mb-4"></i>
+                                <p className="font-semibold">No hay facturas emitidas</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
         };
+
+        // ----------------------------
+        // MODAL PARA BARRIOS
+        // ----------------------------
+
+        const BarrioModal = ({ barrio, localidades, onClose, onSave }) => {
+            const [formData, setFormData] = useState({
+                nombre: barrio?.nombre_barrio || '',
+                id_localidad: barrio?.id_localidad || ''
+            });
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = barrio?.id_barrio
+                    ? { ...formData, id_barrio: barrio.id_barrio }
+                    : formData;
+                onSave(dataToSave);
+            };
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{barrio ? 'Editar Barrio' : 'Añadir Barrio'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 gap-4">
+                                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre del barrio" className="p-3 border rounded-lg" required />
+                                <select name="id_localidad" value={formData.id_localidad} onChange={handleChange} className="p-3 border rounded-lg" required>
+                                    <option value="" disabled>Seleccione una Localidad</option>
+                                    {localidades.map(loc => (
+                                        <option key={loc.id_localidad} value={loc.id_localidad}>{loc.nombre_localidad}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ---------------------------------
+        // PÁGINA DE GESTIÓN DE BARRIOS
+        // ---------------------------------
+
+        const BarriosPage = ({ barrios, localidades, onSave, onDelete }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingBarrio, setEditingBarrio] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const filteredBarrios = barrios.filter(barrio =>
+                Object.values(barrio).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+            return (
+                <div>
+                    {isModalOpen && (
+                        <BarrioModal
+                            barrio={editingBarrio}
+                            localidades={localidades}
+                            onClose={() => { setIsModalOpen(false); setEditingBarrio(null); }}
+                            onSave={onSave}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Barrios</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar barrio, localidad..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button onClick={() => { setEditingBarrio(null); setIsModalOpen(true); }} className="bg-orange-500 text-white py-2 px-6 rounded-lg">Añadir Barrio</button>
+                        </div>
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50 border-b">
+                                <tr>
+                                    <th className="p-4">Barrio</th>
+                                    <th className="p-4">Localidad</th>
+                                    <th className="p-4 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredBarrios.map(barrio => (
+                                    <tr key={barrio.id_barrio} className="border-b hover:bg-gray-50">
+                                        <td className="p-4">{barrio.nombre_barrio}</td>
+                                        <td className="p-4">{barrio.nombre_localidad}</td>
+                                        <td className="p-4 text-center">
+                                            <button
+                                                onClick={() => handleEdit(barrio)}
+                                                className="text-blue-500 hover:text-blue-700 p-2"
+                                                title="Editar"
+                                            >
+                                                <i className="fas fa-edit fa-lg"></i>
+                                            </button>
+                                            <button
+                                                onClick={() => onDelete(barrio.id_barrio)}
+                                                className="text-red-500 hover:text-red-700 p-2"
+                                                title="Eliminar"
+                                            >
+                                                <i className="fas fa-trash-alt fa-lg"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // ----------------------------
+        // MODAL PARA LOCALIDADES
+        // ----------------------------
+
+        const LocalidadModal = ({ localidad, onClose, onSave }) => {
+            const [nombre, setNombre] = useState(localidad?.nombre_localidad || '');
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = localidad?.id_localidad
+                    ? { nombre, id_localidad: localidad.id_localidad }
+                    : { nombre };
+                onSave(dataToSave);
+            };
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{localidad ? 'Editar Localidad' : 'Añadir Localidad'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Nombre de la localidad" className="p-3 border rounded-lg w-full" required />
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ---------------------------------
+        // PÁGINA DE GESTIÓN DE LOCALIDADES
+        // ---------------------------------
+
+        const LocalidadesPage = ({ localidades, onSave, onDelete }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingLocalidad, setEditingLocalidad] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const filteredLocalidades = localidades.filter(localidad =>
+                Object.values(localidad).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+            return (
+                <div>
+                    {isModalOpen && (
+                        <LocalidadModal
+                            localidad={editingLocalidad}
+                            onClose={() => { setIsModalOpen(false); setEditingLocalidad(null); }}
+                            onSave={onSave}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Localidades</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar localidad..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button onClick={() => { setEditingLocalidad(null); setIsModalOpen(true); }} className="bg-orange-500 text-white py-2 px-6 rounded-lg">Añadir Localidad</button>
+                        </div>
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50 border-b">
+                                <tr>
+                                    <th className="p-4">Localidad</th>
+                                    <th className="p-4 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredLocalidades.map(localidad => (
+                                    <tr key={localidad.id_localidad} className="border-b hover:bg-gray-50">
+                                        <td className="p-4">{localidad.nombre_localidad}</td>
+                                        <td className="p-4 text-center">
+                                            <button
+                                                onClick={() => handleEdit(localidad)}
+                                                className="text-blue-500 hover:text-blue-700 p-2"
+                                                title="Editar"
+                                            >
+                                                <i className="fas fa-edit fa-lg"></i>
+                                            </button>
+                                            <button
+                                                onClick={() => onDelete(localidad.id_localidad)}
+                                                className="text-red-500 hover:text-red-700 p-2"
+                                                title="Eliminar"
+                                            >
+                                                <i className="fas fa-trash-alt fa-lg"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // ----------------------------
+        // MODAL PARA ENFERMEDADES
+        // ----------------------------
+
+        const EnfermedadModal = ({ enfermedad, onClose, onSave }) => {
+            const [formData, setFormData] = useState({
+                nombre: enfermedad?.nombre_enfermedad || '',
+                descripcion: enfermedad?.descripcion_enfermedad || ''
+            });
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = enfermedad?.id_enfermedad
+                    ? { ...formData, id_enfermedad: enfermedad.id_enfermedad }
+                    : formData;
+                onSave(dataToSave);
+            };
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{enfermedad ? 'Editar Enfermedad' : 'Añadir Enfermedad'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre de la enfermedad" className="p-3 border rounded-lg w-full mb-4" required />
+                            <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} placeholder="Descripción" className="p-3 border rounded-lg w-full" required />
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ---------------------------------
+        // PÁGINA DE GESTIÓN DE ENFERMEDADES
+        // ---------------------------------
+
+        const EnfermedadesPage = ({ enfermedades, onSave, onDelete }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingEnfermedad, setEditingEnfermedad] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const filteredEnfermedades = enfermedades.filter(enf =>
+                Object.values(enf).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+            return (
+                <div>
+                    {isModalOpen && (
+                        <EnfermedadModal
+                            enfermedad={editingEnfermedad}
+                            onClose={() => { setIsModalOpen(false); setEditingEnfermedad(null); }}
+                            onSave={onSave}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Gestión de Enfermedades</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar enfermedad..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button onClick={() => { setEditingEnfermedad(null); setIsModalOpen(true); }} className="bg-orange-500 text-white py-2 px-6 rounded-lg">Añadir Enfermedad</button>
+                        </div>
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50 border-b">
+                                <tr>
+                                    <th className="p-4">Nombre</th>
+                                    <th className="p-4">Descripción</th>
+                                    <th className="p-4 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredEnfermedades.map(enf => (
+                                    <tr key={enf.id_enfermedad} className="border-b hover:bg-gray-50">
+                                        <td className="p-4">{enf.nombre_enfermedad}</td>
+                                        <td className="p-4">{enf.descripcion_enfermedad}</td>
+                                        <td className="p-4 text-center">
+                                            <button
+                                                onClick={() => handleEdit(enf)}
+                                                className="text-blue-500 hover:text-blue-700 p-2"
+                                                title="Editar"
+                                            >
+                                                <i className="fas fa-edit fa-lg"></i>
+                                            </button>
+                                            <button
+                                                onClick={() => onDelete(enf.id_enfermedad)}
+                                                className="text-red-500 hover:text-red-700 p-2"
+                                                title="Eliminar"
+                                            >
+                                                <i className="fas fa-trash-alt fa-lg"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {filteredEnfermedades.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-virus fa-3x mb-4"></i>
+                                <p className="font-semibold">No se encontraron enfermedades</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --------------------------------------
+        // MODAL PARA ENFERMEDADES DE MASCOTAS
+        // --------------------------------------
+
+        const EnfermedadMascotaModal = ({ em, mascotas, enfermedades, onClose, onSave }) => {
+            const [formData, setFormData] = useState({
+                id_mascota: em?.id_mascota || '',
+                id_enfermedad: em?.id_enfermedad || '',
+                fecha_diagnostico: em?.fecha_diagnostico || ''
+            });
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = em?.id_enfermedad_mascota
+                    ? { ...formData, id_enfermedad_mascota: em.id_enfermedad_mascota }
+                    : formData;
+                onSave(dataToSave);
+            };
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{em ? 'Editar Diagnóstico' : 'Añadir Diagnóstico'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <select name="id_mascota" value={formData.id_mascota} onChange={handleChange} className="p-3 border rounded-lg w-full mb-4" required>
+                                <option value="" disabled>Seleccione Mascota</option>
+                                {mascotas.map(m => (
+                                    <option key={m.id_mascota} value={m.id_mascota}>{m.nombre}</option>
+                                ))}
+                            </select>
+                            <select name="id_enfermedad" value={formData.id_enfermedad} onChange={handleChange} className="p-3 border rounded-lg w-full mb-4" required>
+                                <option value="" disabled>Seleccione Enfermedad</option>
+                                {enfermedades.map(e => (
+                                    <option key={e.id_enfermedad} value={e.id_enfermedad}>{e.nombre_enfermedad}</option>
+                                ))}
+                            </select>
+                            <input type="date" name="fecha_diagnostico" value={formData.fecha_diagnostico} onChange={handleChange} className="p-3 border rounded-lg w-full" required />
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ------------------------------------------------
+        // PÁGINA DE GESTIÓN DE ENFERMEDADES DE MASCOTAS
+        // ------------------------------------------------
+
+        const EnfermedadesMascotasPage = ({ enfermedadesMascotas, mascotas, enfermedades, onSave, onDelete }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingEM, setEditingEM] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const filteredEM = enfermedadesMascotas.filter(em =>
+                Object.values(em).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+            return (
+                <div>
+                    {isModalOpen && (
+                        <EnfermedadMascotaModal
+                            em={editingEM}
+                            mascotas={mascotas}
+                            enfermedades={enfermedades}
+                            onClose={() => { setIsModalOpen(false); setEditingEM(null); }}
+                            onSave={onSave}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Diagnóstico de Enfermedades en Mascotas</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar mascota, enfermedad..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button onClick={() => { setEditingEM(null); setIsModalOpen(true); }} className="bg-orange-500 text-white py-2 px-6 rounded-lg">Añadir Diagnóstico</button>
+                        </div>
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50 border-b">
+                                <tr>
+                                    <th className="p-4">Mascota</th>
+                                    <th className="p-4">Enfermedad</th>
+                                    <th className="p-4">Fecha Diagnóstico</th>
+                                    <th className="p-4 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredEM.map(em => (
+                                    <tr key={em.id_enfermedad_mascota} className="border-b hover:bg-gray-50">
+                                        <td className="p-4">{em.nombre_mascota}</td>
+                                        <td className="p-4">{em.nombre_enfermedad}</td>
+                                        <td className="p-4">{em.fecha_diagnostico}</td>
+                                        <td className="p-4 text-center">
+                                            <button
+                                                onClick={() => handleEdit(em)}
+                                                className="text-blue-500 hover:text-blue-700 p-2"
+                                                title="Editar"
+                                            >
+                                                <i className="fas fa-edit fa-lg"></i>
+                                            </button>
+                                            <button
+                                                onClick={() => onDelete(em.id_enfermedad_mascota)}
+                                                className="text-red-500 hover:text-red-700 p-2"
+                                                title="Eliminar"
+                                            >
+                                                <i className="fas fa-trash-alt fa-lg"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {filteredEM.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-dog fa-3x mb-4"></i>
+                                <p className="font-semibold">No se encontraron diagnósticos</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --------------------------------------
+        // MODAL PARA SERVICIOS
+        // --------------------------------------
+
+        const ServicioModal = ({ servicio, onClose, onSave }) => {
+            const [formData, setFormData] = useState({
+                nombre: servicio?.nombre_servicio || '',
+                descripcion: servicio?.descripcion_servicio || '',
+                precio: servicio?.precio_servicio || ''
+            });
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = servicio?.id_servicio
+                    ? { ...formData, id_servicio: servicio.id_servicio }
+                    : formData;
+                onSave(dataToSave);
+            };
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{servicio ? 'Editar Servicio' : 'Añadir Servicio'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre del servicio" className="p-3 border rounded-lg w-full mb-4" required />
+                            <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} placeholder="Descripción" className="p-3 border rounded-lg w-full mb-4" required />
+                            <input type="number" name="precio" value={formData.precio} onChange={handleChange} placeholder="Precio" className="p-3 border rounded-lg w-full" required />
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ------------------------------------------------
+        // PÁGINA DE GESTIÓN DE SERVICIOS
+        // ------------------------------------------------
+
+        const ServiciosPage = ({ servicios, onSave, onDelete }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingServicio, setEditingServicio] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const filteredServicios = servicios.filter(servicio =>
+                Object.values(servicio).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+            return (
+                <div>
+                    {isModalOpen && (
+                        <ServicioModal
+                            servicio={editingServicio}
+                            onClose={() => { setIsModalOpen(false); setEditingServicio(null); }}
+                            onSave={onSave}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Gestión de Servicios</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar servicio..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button onClick={() => { setEditingServicio(null); setIsModalOpen(true); }} className="bg-orange-500 text-white py-2 px-6 rounded-lg">Añadir Servicio</button>
+                        </div>
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50 border-b">
+                                <tr>
+                                    <th className="p-4">Nombre</th>
+                                    <th className="p-4">Descripción</th>
+                                    <th className="p-4">Precio</th>
+                                    <th className="p-4 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredServicios.map(servicio => (
+                                    <tr key={servicio.id_servicio} className="border-b hover:bg-gray-50">
+                                        <td className="p-4">{servicio.nombre_servicio}</td>
+                                        <td className="p-4">{servicio.descripcion_servicio}</td>
+                                        <td className="p-4">${servicio.precio_servicio}</td>
+                                        <td className="p-4 text-center">
+                                            <button
+                                                onClick={() => handleEdit(servicio)}
+                                                className="text-blue-500 hover:text-blue-700 p-2"
+                                                title="Editar"
+                                            >
+                                                <i className="fas fa-edit fa-lg"></i>
+                                            </button>
+                                            <button
+                                                onClick={() => onDelete(servicio.id_servicio)}
+                                                className="text-red-500 hover:text-red-700 p-2"
+                                                title="Eliminar"
+                                            >
+                                                <i className="fas fa-trash-alt fa-lg"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {filteredServicios.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-concierge-bell fa-3x mb-4"></i>
+                                <p className="font-semibold">No se encontraron servicios</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --------------------------------------
+        // MODAL PARA TRATAMIENTOS
+        // --------------------------------------
+
+        const TratamientoModal = ({ tratamiento, citas, onClose, onSave }) => {
+            const [formData, setFormData] = useState({
+                descripcion: tratamiento?.descripcion_tratamiento || '',
+                medicamento: tratamiento?.nombre_medicamento || '',
+                dosis: tratamiento?.dosis || '',
+                id_cita: tratamiento?.id_cita || ''
+            });
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = tratamiento?.id_tratamiento
+                    ? { ...formData, id_tratamiento: tratamiento.id_tratamiento }
+                    : formData;
+                onSave(dataToSave);
+            };
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{tratamiento ? 'Editar Tratamiento' : 'Añadir Tratamiento'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <input type="text" name="descripcion" value={formData.descripcion} onChange={handleChange} placeholder="Descripción" className="p-3 border rounded-lg w-full mb-4" required />
+                            <input type="text" name="medicamento" value={formData.medicamento} onChange={handleChange} placeholder="Medicamento" className="p-3 border rounded-lg w-full mb-4" required />
+                            <input type="text" name="dosis" value={formData.dosis} onChange={handleChange} placeholder="Dosis" className="p-3 border rounded-lg w-full mb-4" required />
+                            <select name="id_cita" value={formData.id_cita} onChange={handleChange} className="p-3 border rounded-lg w-full mb-4" required>
+                                <option value="" disabled>Seleccione Cita</option>
+                                {citas.map(cita => (
+                                    <option key={cita.id_cita} value={cita.id_cita}>{cita.fecha} - {cita.nombre_mascota}</option>
+                                ))}
+                            </select>
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ------------------------------------------------
+        // PÁGINA DE GESTIÓN DE TRATAMIENTOS
+        // ------------------------------------------------
+
+        const TratamientosPage = ({ tratamientos, citas, onSave, onDelete }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingTratamiento, setEditingTratamiento] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const filteredTratamientos = tratamientos.filter(trat =>
+                Object.values(trat).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+            return (
+                <div>
+                    {isModalOpen && (
+                        <TratamientoModal
+                            tratamiento={editingTratamiento}
+                            citas={citas}
+                            onClose={() => { setIsModalOpen(false); setEditingTratamiento(null); }}
+                            onSave={onSave}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Gestión de Tratamientos</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar tratamiento, medicamento..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button onClick={() => { setEditingTratamiento(null); setIsModalOpen(true); }} className="bg-orange-500 text-white py-2 px-6 rounded-lg">Añadir Tratamiento</button>
+                        </div>
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50 border-b">
+                                <tr>
+                                    <th className="p-4">Descripción</th>
+                                    <th className="p-4">Medicamento</th>
+                                    <th className="p-4">Dosis</th>
+                                    <th className="p-4">Cita</th>
+                                    <th className="p-4 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredTratamientos.map(trat => (
+                                    <tr key={trat.id_tratamiento} className="border-b hover:bg-gray-50">
+                                        <td className="p-4">{trat.descripcion_tratamiento}</td>
+                                        <td className="p-4">{trat.nombre_medicamento}</td>
+                                        <td className="p-4">{trat.dosis}</td>
+                                        <td className="p-4">{trat.fecha} - {trat.nombre_mascota}</td>
+                                        <td className="p-4 text-center">
+                                            <button
+                                                onClick={() => handleEdit(trat)}
+                                                className="text-blue-500 hover:text-blue-700 p-2"
+                                                title="Editar"
+                                            >
+                                                <i className="fas fa-edit fa-lg"></i>
+                                            </button>
+                                            <button
+                                                onClick={() => onDelete(trat.id_tratamiento)}
+                                                className="text-red-500 hover:text-red-700 p-2"
+                                                title="Eliminar"
+                                            >
+                                                <i className="fas fa-trash-alt fa-lg"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {filteredTratamientos.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-pills fa-3x mb-4"></i>
+                                <p className="font-semibold">No se encontraron tratamientos</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        /* NO SIRVE
+        // --------------------------------------
+        // MODAL PARA DETALLE DE FACTURACIÓN
+        // --------------------------------------
+
+        const DetalleFacturaModal = ({ detalle, facturas, servicios, onClose, onSave }) => {
+            const [formData, setFormData] = useState({
+                id_factura: detalle?.id_factura || '',
+                id_servicio: detalle?.id_servicio || '',
+                cantidad_servicio: detalle?.cantidad_servicio || '',
+                subtotal_servicio: detalle?.subtotal_servicio || ''
+            });
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const dataToSave = detalle?.id_detalle_factura
+                    ? { ...formData, id_detalle_factura: detalle.id_detalle_factura }
+                    : formData;
+                onSave(dataToSave);
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{detalle ? 'Editar Detalle' : 'Añadir Detalle'}</h2>
+                        <form onSubmit={handleSubmit}>
+                            <select name="id_factura" value={formData.id_factura} onChange={handleChange} className="p-3 border rounded-lg w-full mb-4" required>
+                                <option value="" disabled>Seleccione Factura</option>
+                                {facturas.map(f => (
+                                    <option key={f.id_factura} value={f.id_factura}>{f.id_factura}</option>
+                                ))}
+                            </select>
+                            <select name="id_servicio" value={formData.id_servicio} onChange={handleChange} className="p-3 border rounded-lg w-full mb-4" required>
+                                <option value="" disabled>Seleccione Servicio</option>
+                                {servicios.map(s => (
+                                    <option key={s.id_servicio} value={s.id_servicio}>{s.nombre_servicio}</option>
+                                ))}
+                            </select>
+                            <input type="number" name="cantidad" value={formData.cantidad} onChange={handleChange} placeholder="Cantidad" className="p-3 border rounded-lg w-full mb-4" required />
+                            <input type="number" name="subtotal" value={formData.subtotal} onChange={handleChange} placeholder="Subtotal" className="p-3 border rounded-lg w-full" required />
+                            <div className="flex justify-end space-x-4 mt-8">
+                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg">Cancelar</button>
+                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // ------------------------------------------------
+        // PÁGINA DE GESTIÓN DE DETALLE DE FACTURACIÓN
+        // ------------------------------------------------
+
+        const DetalleFacturacionPage = ({ detalles, facturas, servicios, onSave, onDelete }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingDetalle, setEditingDetalle] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const filteredDetalles = detalles.filter(detalle =>
+                Object.values(detalle).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+
+            const handleAdd = () => { setEditingDetalle(null); setIsModalOpen(true); };
+            const handleEdit = (detalle) => { setEditingDetalle(detalle); setIsModalOpen(true); };
+            const handleCloseModal = () => { setIsModalOpen(false); setEditingDetalle(null); };
+
+            return (
+                <div>
+                    {isModalOpen && (
+                        <DetalleFacturaModal
+                            detalle={editingDetalle}
+                            facturas={facturas}
+                            servicios={servicios}
+                            onClose={() => { setIsModalOpen(false); setEditingDetalle(null); }}
+                            onSave={onSave}
+                        />
+                    )}
+                    <header className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Detalle de Facturación</h1>
+                    </header>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div className="relative w-full md:w-1/3">
+                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar detalle, factura, servicio..."
+                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <button onClick={() => { setEditingDetalle(null); setIsModalOpen(true); }} className="bg-orange-500 text-white py-2 px-6 rounded-lg">Añadir Detalle</button>
+                        </div>
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50 border-b">
+                                <tr>
+                                    <th className="p-4">Factura</th>
+                                    <th className="p-4">Servicio</th>
+                                    <th className="p-4">Cantidad</th>
+                                    <th className="p-4">Subtotal</th>
+                                    <th className="p-4 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredDetalles.map(detalle => (
+                                    <tr key={detalle.id_detalle_factura} className="border-b hover:bg-gray-50">
+                                        <td className="p-4 font-mono text-gray-600">{detalle.id_factura}</td>
+                                        <td className="p-4 font-mono text-gray-600">{detalle.nombre_servicio}</td>
+                                        <td className="p-4 font-mono text-gray-600">{detalle.cantidad_servicio}</td>
+                                        <td className="p-4 font-mono text-gray-600">${detalle.subtotal_servicio}</td>
+                                        <td className="p-4 text-center">
+                                            <button
+                                                onClick={() => handleEdit(detalle.id_detalle_factura)}
+                                                className="text-blue-500 hover:text-blue-700 p-2"
+                                                title="Editar"
+                                            >
+                                                <i className="fas fa-edit fa-lg"></i>
+                                            </button>
+                                            <button
+                                                onClick={() => onDelete(detalle.id_detalle_factura)}
+                                                className="text-red-500 hover:text-red-700 p-2"
+                                                title="Eliminar"
+                                            >
+                                                <i className="fas fa-trash-alt fa-lg"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {filteredDetalles.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                <i className="fas fa-file-invoice fa-3x mb-4"></i>
+                                <p className="font-semibold">No se encontraron detalles de facturación</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        */
+
+        //-----------------------------------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------------------------------
 
         // --- CONTENEDOR PRINCIPAL DEL DASHBOARD ---
         const DashboardPage = ({ user, onLogout }) => {
             const [activeView, setActiveView] = useState('pets');
-            const [data, setData] = useState({ pets: [], clients: [], appointments: [], vets: [], bills: [] });
+            const [data, setData] = useState({ pets: [], clients: [], appointments: [], vets: [], billing: [], users: [] });
             const [loading, setLoading] = useState(true);
 
             const fetchAllData = useCallback(async () => {
                 setLoading(true);
                 try {
-                    const responses = await Promise.all([fetch(`${API_URL}/mascotas`), fetch(`${API_URL}/clientes`)]);
+                    const responses = await Promise.all([
+                        fetch(`${API_URL}/mascotas`),
+                        fetch(`${API_URL}/clientes`),
+                        fetch(`${API_URL}/citas`),
+                        fetch(`${API_URL}/facturacion`),
+                        fetch(`${API_URL}/usuarios`),
+                        fetch(`${API_URL}/veterinarios`),
+                        fetch(`${API_URL}/barrios`),
+                        fetch(`${API_URL}/localidades`),
+                        fetch(`${API_URL}/enfermedades`),
+                        fetch(`${API_URL}/enfermedades_mascotas`),
+                        fetch(`${API_URL}/servicios`),
+                        fetch(`${API_URL}/tratamientos`),
+                        //fetch(`${API_URL}/detalles_facturas`)
+                    ]);
                     for (const res of responses) { if (!res.ok) throw new Error('Error al cargar los datos.'); }
-                    const [pets, clients] = await Promise.all(responses.map(res => res.json()));
-                    setData({ pets, clients });
+                    const [pets, clients, appointments, billing, users, vets, barrios, localidades, enfermedades, enfermedadesMascotas, servicios, tratamientos, detallesFacturas] = await Promise.all(responses.map(res => res.json()));
+                    setData({ pets, clients, appointments, billing, users, vets, barrios, localidades, enfermedades, enfermedadesMascotas, servicios, tratamientos, detallesFacturas });
                 } catch (error) { console.error("Error fetching data:", error); alert('No se pudieron cargar los datos.'); }
                 finally { setLoading(false); }
             }, []);
@@ -158,7 +1864,16 @@
                     case 'pets': return <PetsPage data={data} onSave={(item) => handleSave('mascotas', item)} onDelete={(id) => handleDelete('mascotas', id)} />;
                     case 'clients': return <ClientsPage data={data} onSave={(item) => handleSave('clientes', item)} onDelete={(id) => handleDelete('clientes', id)} />;
                     case 'appointments': return <AppointmentsPage data={data} onSave={(item) => handleSave('citas', item)} onDelete={(id) => handleDelete('citas', id)} />;
-                    case 'billing': return <BillingPage data={data} />;
+                    case 'billing': return <BillingPage data={data} onSave={(item) => handleSave('facturacion', item)} onDelete={(id) => handleDelete('facturacion', id)} />;
+                    case 'users': return <UsersPage users={data.users} onSave={(item) => handleSave('usuarios', item)} onDelete={(id) => handleDelete('usuarios', id)} />;
+                    case 'vets': return <VetsPage vets={data.vets} usuarios={data.users} onSave={(item) => handleSave('veterinarios', item)} onDelete={(id) => handleDelete('veterinarios', id)} />;
+                    case 'barrios': return <BarriosPage barrios={data.barrios} localidades={data.localidades} onSave={(item) => handleSave('barrios', item)} onDelete={(id) => handleDelete('barrios', id)} />;
+                    case 'localidades': return <LocalidadesPage localidades={data.localidades} onSave={(item) => handleSave('localidades', item)} onDelete={(id) => handleDelete('localidades', id)} />;
+                    case 'enfermedades': return <EnfermedadesPage enfermedades={data.enfermedades} onSave={(item) => handleSave('enfermedades', item)} onDelete={(id) => handleDelete('enfermedades', id)} />;
+                    case 'enfermedadesMascotas': return <EnfermedadesMascotasPage enfermedadesMascotas={data.enfermedadesMascotas} mascotas={data.pets} enfermedades={data.enfermedades} onSave={(item) => handleSave('enfermedades_mascotas', item)} onDelete={(id) => handleDelete('enfermedades_mascotas', id)} />;
+                    case 'servicios': return <ServiciosPage servicios={data.servicios} onSave={(item) => handleSave('servicios', item)} onDelete={(id) => handleDelete('servicios', id)} />;
+                    case 'tratamientos': return <TratamientosPage tratamientos={data.tratamientos} onSave={(item) => handleSave('tratamientos', item)} onDelete={(id) => handleDelete('tratamientos', id)} />;
+                    // case 'detallesFacturas': return <DetallesFacturasPage detallesFacturas={data.detallesFacturas} onSave={(item) => handleSave('detalles_facturas', item)} onDelete={(id) => handleDelete('detalles_facturas', id)} />;
                     default: return <PetsPage data={data} />;
                 }
             };
@@ -175,6 +1890,15 @@
                     <NavLink view="clients" icon="fa-users">Clientes</NavLink>
                     <NavLink view="appointments" icon="fa-calendar-alt">Citas</NavLink>
                     <NavLink view="billing" icon="fa-file-invoice">Facturación</NavLink>
+                    <NavLink view="users" icon="fa-users">Usuarios</NavLink>
+                    <NavLink view="vets" icon="fa-user-md">Veterinarios</NavLink>
+                    <NavLink view="barrios" icon="fa-map-marker-alt">Barrios</NavLink>
+                    <NavLink view="localidades" icon="fa-map-marker-alt">Localidades</NavLink>
+                    <NavLink view="enfermedades" icon="fa-medkit">Enfermedades</NavLink>
+                    <NavLink view="enfermedadesMascotas" icon="fa-medkit">Enfermedades de Mascotas</NavLink>
+                    <NavLink view="servicios" icon="fa-concierge-bell">Servicios</NavLink>
+                    <NavLink view="tratamientos" icon="fa-user-md">Tratamientos</NavLink>
+                    {/* <NavLink view="detallesFacturas" icon="fa-file-invoice">Detalles de Facturación</NavLink> */}
                 </nav><div className="p-4 border-t"><button onClick={onLogout} className="w-full flex items-center p-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg"><i className="fas fa-sign-out-alt w-6"></i><span>Cerrar Sesión</span></button></div></aside>
                 <main className="flex-1 p-8 overflow-y-auto">{renderActiveView()}</main>
             </div>);
@@ -228,11 +1952,37 @@
 
         // --- COMPONENTE PRINCIPAL DE LA APP ---
         const App = () => {
-            const [user, setUser] = useState(null);
-            const [currentPage, setCurrentPage] = useState('landing');
-            const handleLogin = (userData) => { setUser(userData); setCurrentPage('dashboard'); };
-            const handleLogout = () => { setUser(null); setCurrentPage('landing'); };
-            const handleRegister = (userData) => { setUser(userData); setCurrentPage('dashboard'); };
+            // Recupera el usuario guardado en localStorage al iniciar la app
+            const [user, setUser] = useState(() => {
+                const saved = localStorage.getItem('wapokiUser');
+                return saved ? JSON.parse(saved) : null;
+            });
+            const [currentPage, setCurrentPage] = useState(() => {
+                const saved = localStorage.getItem('wapokiUser');
+                return saved ? 'dashboard' : 'landing';
+            });
+
+            // Guarda el usuario en localStorage al iniciar sesión
+            const handleLogin = (userData) => {
+                setUser(userData);
+                localStorage.setItem('wapokiUser', JSON.stringify(userData));
+                setCurrentPage('dashboard');
+            };
+
+            // Borra el usuario de localStorage al cerrar sesión
+            const handleLogout = () => {
+                setUser(null);
+                localStorage.removeItem('wapokiUser');
+                setCurrentPage('landing');
+            };
+
+            // Guarda el usuario en localStorage al registrarse
+            const handleRegister = (userData) => {
+                setUser(userData);
+                localStorage.setItem('wapokiUser', JSON.stringify(userData));
+                setCurrentPage('dashboard');
+            };
+
             const renderPage = () => {
                 switch (currentPage) {
                     case 'login': return <LoginPage onLogin={handleLogin} onNavigate={setCurrentPage} />;
