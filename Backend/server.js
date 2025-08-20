@@ -755,6 +755,7 @@ app.get('/api/citas', async (req, res) => {
                 c.fecha,
                 c.hora,
                 c.motivo,
+                c.id_veterinario,
                 m.nombre AS nombre_mascota,
                 v.nombre AS nombre_veterinario,
                 cl.nombre AS nombre_cliente
