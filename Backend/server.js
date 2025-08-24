@@ -1094,7 +1094,56 @@ app.delete('/api/detalles_facturas/:id', async (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
- 
+
+// ---------------------------------
+// --- LOGIN DE USUARIOS
+// ---------------------------------
+app.post('/api/ingreso', async (req, res) => {
+    try {
+        const { nombre_usuario, contrasenia } = req.body;   
+        if (!nombre_usuario || !contrasenia) {
+            return res.status(400).json({ error: 'Nombre de usuario y contraseña son requeridos' });
+        }   
+        const sql = 'SELECT * FROM usuarios WHERE nombre_usuario = ? AND contrasenia = ?';
+        const [rows] = await pool.query(sql, [nombre_usuario, contrasenia]);    
+        if (rows.length === 0) {
+            // Si no existe usuario o contraseña incorrecta
+            return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+        }   
+        const usuario = rows[0];
+        res.json({
+            message: 'Autenticación satisfactoria',
+            usuario: {
+                id: usuario.id_usuario,
+                nombre_usuario: usuario.nombre_usuario,
+                rol: usuario.rol
+            }
+        });
+    } catch (error) {
+        console.error('Error en el login:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// --------------------------------------
+// --. REGISTRO DE USUARIOS
+// --------------------------------------
+app.post('/api/registro', async (req, res) => {
+    try {
+        const { nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol } = req.body;
+        if (!nombre_usuario || !contrasenia || !nombre || !apellido || !email || !telefono || !rol) {
+            return res.status(400).json({ error: 'Todos los campos son requeridos: nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol' });
+        }
+        const [result] = await pool.query(
+            'INSERT INTO usuarios (nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol]
+        );
+        res.status(201).json({ message: 'Usuario registrado exitosamente', id_usuario: result.insertId });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al registrar usuario' });
+    }
+});
 
 // --- Iniciar el servidor ---
 app.listen(PORT, () => {
