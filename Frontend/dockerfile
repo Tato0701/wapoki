@@ -1,0 +1,11 @@
+# Dockerfile (en /frontend)
+FROM node:20
+WORKDIR /app
+# Copia todos los archivos (HTML, CSS, imágenes, etc)
+COPY . .
+# Instala un servidor estático liviano, por ejemplo "serve"
+RUN npm install -g serve
+# Expone el puerto 3000
+EXPOSE 3000
+# Comando para servir la carpeta actual en el puerto 3000
+CMD ["serve", "-s", ".", "-l", "3000"]

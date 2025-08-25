@@ -10,7 +10,7 @@ const cors = require('cors');
 // --- APP(Inicializa) express
 const app = express();
 // --- Define el puerto donde funcionará.
-const PORT = process.env.PORT || 3006;
+const PORT = process.env.PORT || 4000;
 
 // --- Middlewares --- 
 app.use(cors());
@@ -18,10 +18,11 @@ app.use(express.json());
 
 // --- Configuración de la conexión a la Base de Datos MySQL ---
 const dbConfig = {
-    host: '127.0.0.1',
-    user: 'root',
-    password: 'Tatiana123456',
-    database: 'wapoki'
+  host: process.env.DB_HOST || '127.0.0.1',
+  user: process.env.DB_USER || 'root',
+  port: process.env.DB_PORT || 3306,
+  password: process.env.DB_PASS || 'Tatiana123456',
+  database: process.env.DB_NAME || 'wapoki'
 };
 
 // --- Pool de Conexiones a la DB ---
@@ -38,7 +39,8 @@ const pool = mysql.createPool(dbConfig);
 app.get('/api/usuarios', async (req, res) => {
     try {
         const sql = `
-            SELECT   
+            SELECT 
+                u.id_usuario,
                 u.nombre_usuario,
                 u.nombre,
                 u.apellido,
@@ -75,9 +77,9 @@ app.post('/api/usuarios', async (req, res) => {
 // ACTUALIZAR UN USUARIO
 app.put('/api/usuarios/:id', async (req, res) => {
     try {
-        const { id } = req.params;
+        let { id } = req.params;
         const { nombre_usuario, nombre, apellido, email, telefono, rol } = req.body;
-
+        id = parseInt(id, 10);
         const sql = 'UPDATE usuarios SET nombre_usuario = ?, nombre = ?, apellido = ?, email = ?, telefono = ?, rol = ? WHERE id_usuario = ?';
         const [result] = await pool.query(sql, [nombre_usuario, nombre, apellido, email, telefono, rol, id]);
 
