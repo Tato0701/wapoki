@@ -420,7 +420,7 @@ app.delete('/api/barrios/:id', async (req, res) => {
 });
 
 // ------------------------------
-// --- CRUD para clientes
+// --- CRUD para clientes ✔
 // ------------------------------
 
 // OBTENER TODOS LOS CLIENTES
@@ -663,7 +663,7 @@ app.delete('/api/enfermedades/:id', async (req, res) => {
 });
 
 // ----------------------------------------
-// --- CRUD para enfermedades de mascotas
+// --- CRUD para enfermedades de mascotas ✔
 // ----------------------------------------
 
 // OBTENER TODAS LAS ENFERMEDADES MASCOTAS

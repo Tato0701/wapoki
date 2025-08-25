@@ -226,7 +226,11 @@
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [editingClient, setEditingClient] = useState(null);
             const [searchTerm, setSearchTerm] = useState('');
-            const filteredClients = clients.filter(client => Object.values(client).some(value => String(value).toLowerCase().includes(searchTerm.toLowerCase())));
+            const filteredClients = clients.filter(client =>
+                Object.values(client).some(value =>
+                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
             return (
                 <div>
                     {isModalOpen &&
@@ -271,10 +275,18 @@
                                             </td>
                                             <td className="p-4 text-gray-700">{client.direccion}</td>
                                             <td className="p-4 text-center">
-                                                <button onClick={() => { setEditingClient(client); setIsModalOpen(true); }} className="text-blue-500 hover:text-blue-700 p-2" title="Editar">
+                                                <button
+                                                    onClick={() => { setEditingClient(client); setIsModalOpen(true); }}
+                                                    className="text-blue-500 hover:text-blue-700 p-2"
+                                                    title="Editar"
+                                                >
                                                     <i className="fas fa-edit fa-lg"></i>
                                                 </button>
-                                                <button onClick={() => onDelete(client.id_cliente)} className="text-red-500 hover:text-red-700 p-2" title="Eliminar">
+                                                <button
+                                                    onClick={() => onDelete(client.id_cliente)}
+                                                    className="text-red-500 hover:text-red-700 p-2"
+                                                    title="Eliminar"
+                                                >
                                                     <i className="fas fa-trash-alt fa-lg"></i>
                                                 </button>
                                             </td>
@@ -301,7 +313,7 @@
         const UserModal = ({ user, onClose, onSave }) => {
             const [formData, setFormData] = useState({
                 nombre_usuario: user?.nombre_usuario || '',
-                contrasenia: '', // Por seguridad, no se muestra la contraseña actual
+                contrasenia: user?.nombre_usuario || '', // Por seguridad, no se muestra la contraseña actual
                 nombre: user?.nombre || '',
                 apellido: user?.apellido || '',
                 email: user?.email || '',
@@ -355,7 +367,8 @@
         // PÁGINA DE GESTIÓN DE USUARIOS
         // ---------------------------------
 
-        const UsersPage = ({ users, onSave, onDelete }) => {
+        const UsersPage = ({ data, onSave, onDelete }) => {
+            const { users } = data;
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [editingUser, setEditingUser] = useState(null);
             const [searchTerm, setSearchTerm] = useState('');
@@ -368,13 +381,13 @@
 
             return (
                 <div>
-                    {isModalOpen && (
+                    {isModalOpen &&
                         <UserModal
                             user={editingUser}
                             onClose={() => { setIsModalOpen(false); setEditingUser(null); }}
                             onSave={onSave}
                         />
-                    )}
+                    }
                     <header className="mb-8">
                         <h1 className="text-3xl font-bold text-gray-800">Panel de Gestión de Usuarios</h1>
                     </header>
@@ -1869,7 +1882,7 @@
                     case 'clients': return <ClientsPage data={data} onSave={(item) => handleSave('clientes', item)} onDelete={(id) => handleDelete('clientes', id)} />;
                     case 'appointments': return <AppointmentsPage data={data} onSave={(item) => handleSave('citas', item)} onDelete={(id) => handleDelete('citas', id)} />;
                     case 'billing': return <BillingPage data={data} onSave={(item) => handleSave('facturacion', item)} onDelete={(id) => handleDelete('facturacion', id)} />;
-                    case 'users': return <UsersPage users={data.users} onSave={(item) => handleSave('usuarios', item)} onDelete={(id) => handleDelete('usuarios', id)} />;
+                    case 'users': return <UsersPage data={data} onSave={(item) => handleSave('usuarios', item)} onDelete={(id) => handleDelete('usuarios', id)} />;
                     case 'vets': return <VetsPage vets={data.vets} usuarios={data.users} onSave={(item) => handleSave('veterinarios', item)} onDelete={(id) => handleDelete('veterinarios', id)} />;
                     case 'barrios': return <BarriosPage barrios={data.barrios} localidades={data.localidades} onSave={(item) => handleSave('barrios', item)} onDelete={(id) => handleDelete('barrios', id)} />;
                     case 'localidades': return <LocalidadesPage localidades={data.localidades} onSave={(item) => handleSave('localidades', item)} onDelete={(id) => handleDelete('localidades', id)} />;
