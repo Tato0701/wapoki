@@ -32,7 +32,7 @@ const pool = mysql.createPool(dbConfig);
 // --- Rutas de la API (Endpoints) ---
 
 // ------------------------------
-// --- CRUD para usuarios
+// --- CRUD para usuarios ✔
 // ------------------------------
 
 // OBTENER TODOS LOS USUARIOS
@@ -77,9 +77,9 @@ app.post('/api/usuarios', async (req, res) => {
 // ACTUALIZAR UN USUARIO
 app.put('/api/usuarios/:id', async (req, res) => {
     try {
-        let { id } = req.params;
+        const { id } = req.params;
         const { nombre_usuario, nombre, apellido, email, telefono, rol } = req.body;
-        id = parseInt(id, 10);
+
         const sql = 'UPDATE usuarios SET nombre_usuario = ?, nombre = ?, apellido = ?, email = ?, telefono = ?, rol = ? WHERE id_usuario = ?';
         const [result] = await pool.query(sql, [nombre_usuario, nombre, apellido, email, telefono, rol, id]);
 
@@ -112,7 +112,7 @@ app.delete('/api/usuarios/:id', async (req, res) => {
 });
 
 // ------------------------------
-// --- CRUD para veterinarios
+// --- CRUD para veterinarios ✔
 // ------------------------------
 
 // OBTENER TODOS LOS VETERINARIOS
@@ -120,12 +120,14 @@ app.get('/api/veterinarios', async (req, res) => {
     try {
         const sql = `
             SELECT   
+                v.id_veterinario,
                 v.nombre AS nombre_veterinario,
                 v.apellido AS apellido_veterinario,
                 v.especialidad AS especialidad_veterinario,
                 v.telefono AS telefono_veterinario,
                 v.email AS email_veterinario,
-                u.nombre_usuario
+                u.nombre_usuario,
+                u.id_usuario
             FROM veterinarios AS v
             LEFT JOIN usuarios AS u 
                 ON v.id_usuario = u.id_usuario
@@ -193,14 +195,15 @@ app.delete('/api/veterinarios/:id', async (req, res) => {
 });
 
 // ------------------------------
-// --- CRUD para servicios
+// --- CRUD para servicios ✔
 // ------------------------------
 
 // OBTENER TODOS LOS SERVICIOS
 app.get('/api/servicios', async (req, res) => {
     try {
         const sql = `
-            SELECT   
+            SELECT      
+                s.id_servicio,
                 s.nombre AS nombre_servicio,
                 s.descripcion AS descripcion_servicio,
                 s.precio AS precio_servicio
@@ -214,7 +217,7 @@ app.get('/api/servicios', async (req, res) => {
     }
 });
 
-// AÑADIR UNA NUEVA ENFERMEDAD
+// AÑADIR UN NUEVO SERVICIO
 app.post('/api/servicios', async (req, res) => {
     try {
         const { nombre, descripcion, precio } = req.body;
@@ -277,6 +280,7 @@ app.get('/api/localidades', async (req, res) => {
     try {
         const sql = `
             SELECT   
+                l.id_localidad,
                 l.nombre AS nombre_localidad
             FROM localidades AS l
         `;
@@ -343,7 +347,7 @@ app.delete('/api/localidades/:id', async (req, res) => {
 });
 
 // ------------------------------
-// --- CRUD para barrios
+// --- CRUD para barrios ✔
 // ------------------------------
 
 // OBTENER TODOS LOS BARRIOS
@@ -353,7 +357,8 @@ app.get('/api/barrios', async (req, res) => {
             SELECT   
                 b.id_barrio,
                 b.nombre AS nombre_barrio,
-                l.nombre AS nombre_localidad
+                l.nombre AS nombre_localidad,
+                l.id_localidad
             FROM barrios AS b
             LEFT JOIN localidades AS l 
                 ON b.id_localidad = l.id_localidad
@@ -457,9 +462,8 @@ app.post('/api/clientes', async (req, res) => {
         if (!nombre || !apellido || !telefono || !email || !direccion || !id_barrio) {
             return res.status(400).json({ error: 'Todos los campos son requeridos' });
         }
-        const id_barrio_number = parseInt(id_barrio, 10);
         const sql = 'INSERT INTO clientes (nombre, apellido, telefono, email, direccion, id_barrio) VALUES (?, ?, ?, ?, ?, ?)';
-        const [result] = await pool.query(sql, [nombre, apellido, telefono, email, direccion, id_barrio_number]);
+        const [result] = await pool.query(sql, [nombre, apellido, telefono, email, direccion, id_barrio]);
 
         res.status(201).json({ id_cliente: result.insertId, ...req.body });
     } catch (error) {
@@ -506,7 +510,7 @@ app.delete('/api/clientes/:id', async (req, res) => {
 });
 
 // ------------------------------
-// --- CRUD para mascotas
+// --- CRUD para mascotas ✔
 // ------------------------------
 
 // OBTENER TODAS LAS MASCOTAS
@@ -598,6 +602,7 @@ app.get('/api/enfermedades', async (req, res) => {
     try {
         const sql = `
             SELECT   
+                e.id_enfermedad,
                 e.nombre AS nombre_enfermedad,
                 e.descripcion AS descripcion_enfermedad
             FROM enfermedades AS e
@@ -665,15 +670,18 @@ app.delete('/api/enfermedades/:id', async (req, res) => {
 });
 
 // ----------------------------------------
-// --- CRUD para enfermedades de mascotas ✔
+// --- CRUD para enfermedades de mascotas 
 // ----------------------------------------
 
 // OBTENER TODAS LAS ENFERMEDADES MASCOTAS
 app.get('/api/enfermedades_mascotas', async (req, res) => {
     try {
         const sql = `
-            SELECT   
+            SELECT 
+                em.id_enfermedad_mascota,
+                m.id_mascota,
                 m.nombre AS nombre_mascota,
+                e.id_enfermedad,
                 e.nombre AS nombre_enfermedad,
                 e.descripcion AS descripcion_enfermedad,
                 em.fecha_diagnostico AS fecha_diagnostico
@@ -746,7 +754,7 @@ app.delete('/api/enfermedades_mascotas/:id', async (req, res) => {
 });
 
 // ------------------------------
-// --- CRUD para citas
+// --- CRUD para citas ✔
 // ------------------------------
 
 // OBTENER TODAS LAS CITAS
@@ -754,10 +762,13 @@ app.get('/api/citas', async (req, res) => {
     try {
         const sql = `
             SELECT 
+                c.id_cita,
                 c.fecha,
                 c.hora,
                 c.motivo,
                 c.id_veterinario,
+                c.id_mascota,
+                cl.id_cliente,
                 m.nombre AS nombre_mascota,
                 v.nombre AS nombre_veterinario,
                 cl.nombre AS nombre_cliente
@@ -841,13 +852,18 @@ app.get('/api/tratamientos', async (req, res) => {
     try {
         const sql = `
             SELECT 
+                t.id_tratamiento,
+                t.id_cita,
                 t.descripcion AS descripcion_tratamiento,
                 t.medicamento AS nombre_medicamento,
                 t.dosis,
                 c.fecha,
                 c.hora,
+                m.id_mascota,
                 m.nombre AS nombre_mascota,
                 v.nombre AS nombre_veterinario,
+                v.id_veterinario,
+                cl.id_cliente,
                 cl.nombre AS nombre_cliente
             FROM tratamientos AS t
             LEFT JOIN citas AS c
@@ -935,7 +951,9 @@ app.get('/api/facturacion', async (req, res) => {
                 f.fecha_emision,
                 f.total,
                 f.metodo_pago,
+                f.id_cliente,
                 c.nombre AS nombre_cliente,
+                m.id_mascota,
                 m.nombre AS nombre_mascota
             FROM facturacion AS f
             LEFT JOIN clientes AS c 
@@ -1016,7 +1034,10 @@ app.get('/api/detalles_facturas', async (req, res) => {
         const sql = `
             SELECT 
                 df.id_detalle AS id_detalle_factura,
+                df.id_factura,
+                df.id_servicio,
                 f.fecha_emision,
+                c.id_cliente,
                 c.nombre AS nombre_cliente,
                 m.nombre AS nombre_mascota,
                 s.nombre AS nombre_servicio,
@@ -1097,55 +1118,55 @@ app.delete('/api/detalles_facturas/:id', async (req, res) => {
     }
 });
 
-// ---------------------------------
-// --- LOGIN DE USUARIOS
-// ---------------------------------
-app.post('/api/ingreso', async (req, res) => {
-    try {
-        const { nombre_usuario, contrasenia } = req.body;   
-        if (!nombre_usuario || !contrasenia) {
-            return res.status(400).json({ error: 'Nombre de usuario y contraseña son requeridos' });
-        }   
-        const sql = 'SELECT * FROM usuarios WHERE nombre_usuario = ? AND contrasenia = ?';
-        const [rows] = await pool.query(sql, [nombre_usuario, contrasenia]);    
-        if (rows.length === 0) {
-            // Si no existe usuario o contraseña incorrecta
-            return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
-        }   
-        const usuario = rows[0];
-        res.json({
-            message: 'Autenticación satisfactoria',
-            usuario: {
-                id: usuario.id_usuario,
-                nombre_usuario: usuario.nombre_usuario,
-                rol: usuario.rol
-            }
-        });
-    } catch (error) {
-        console.error('Error en el login:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
-    }
-});
+// // ---------------------------------
+// // --- LOGIN DE USUARIOS
+// // ---------------------------------
+// app.post('/api/ingreso', async (req, res) => {
+//     try {
+//         const { nombre_usuario, contrasenia } = req.body;   
+//         if (!nombre_usuario || !contrasenia) {
+//             return res.status(400).json({ error: 'Nombre de usuario y contraseña son requeridos' });
+//         }   
+//         const sql = 'SELECT * FROM usuarios WHERE nombre_usuario = ? AND contrasenia = ?';
+//         const [rows] = await pool.query(sql, [nombre_usuario, contrasenia]);    
+//         if (rows.length === 0) {
+//             // Si no existe usuario o contraseña incorrecta
+//             return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+//         }   
+//         const usuario = rows[0];
+//         res.json({
+//             message: 'Autenticación satisfactoria',
+//             usuario: {
+//                 id: usuario.id_usuario,
+//                 nombre_usuario: usuario.nombre_usuario,
+//                 rol: usuario.rol
+//             }
+//         });
+//     } catch (error) {
+//         console.error('Error en el login:', error);
+//         res.status(500).json({ error: 'Error interno del servidor' });
+//     }
+// });
 
-// --------------------------------------
-// --. REGISTRO DE USUARIOS
-// --------------------------------------
-app.post('/api/registro', async (req, res) => {
-    try {
-        const { nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol } = req.body;
-        if (!nombre_usuario || !contrasenia || !nombre || !apellido || !email || !telefono || !rol) {
-            return res.status(400).json({ error: 'Todos los campos son requeridos: nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol' });
-        }
-        const [result] = await pool.query(
-            'INSERT INTO usuarios (nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol]
-        );
-        res.status(201).json({ message: 'Usuario registrado exitosamente', id_usuario: result.insertId });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al registrar usuario' });
-    }
-});
+// // --------------------------------------
+// // --. REGISTRO DE USUARIOS
+// // --------------------------------------
+// app.post('/api/registro', async (req, res) => {
+//     try {
+//         const { nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol } = req.body;
+//         if (!nombre_usuario || !contrasenia || !nombre || !apellido || !email || !telefono || !rol) {
+//             return res.status(400).json({ error: 'Todos los campos son requeridos: nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol' });
+//         }
+//         const [result] = await pool.query(
+//             'INSERT INTO usuarios (nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol) VALUES (?, ?, ?, ?, ?, ?, ?)',
+//             [nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol]
+//         );
+//         res.status(201).json({ message: 'Usuario registrado exitosamente', id_usuario: result.insertId });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Error al registrar usuario' });
+//     }
+// });
 
 // --- Iniciar el servidor ---
 app.listen(PORT, () => {
