@@ -1052,6 +1052,7 @@
         // ----------------------------
 
         const LocalidadModal = ({ localidad, onClose, onSave }) => {
+
             const [formData, setFormData] = useState({
                 nombre: localidad?.nombre_localidad || ''
             });
@@ -1060,6 +1061,7 @@
                 const dataToSave = localidad?.id_localidad
                     ? { ...formData, id_localidad: localidad.id_localidad }
                     : { ...formData };
+                console.log(dataToSave);
                 onSave(dataToSave);
             };
             return (
@@ -1067,7 +1069,7 @@
                     <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
                         <h2 className="text-2xl font-bold text-gray-800 mb-6">{localidad ? 'Editar Localidad' : 'Añadir Localidad'}</h2>
                         <form onSubmit={handleSubmit}>
-                            <input type="text" value={formData.nombre} onChange={e => setFormData({ ...formData, nombre: e.target.value })} placeholder="Nombre de la localidad" className="p-3 border rounded-lg w-full" required />
+                            <input type="text" name="nombre" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} placeholder="Nombre de la localidad" className="p-3 border rounded-lg w-full" required />
                             <div className="flex justify-end space-x-4 mt-8">
                                 <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg">Cancelar</button>
                                 <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg">Guardar</button>
@@ -1082,7 +1084,8 @@
         // PÁGINA DE GESTIÓN DE LOCALIDADES
         // ---------------------------------
 
-        const LocalidadesPage = ({ localidades, onSave, onDelete }) => {
+        const LocalidadesPage = ({ data, onSave, onDelete }) => {
+            const { localidades } = data;
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [editingLocalidad, setEditingLocalidad] = useState(null);
             const [searchTerm, setSearchTerm] = useState('');
@@ -1542,293 +1545,6 @@
             );
         };
 
-        // --------------------------------------
-        // MODAL PARA TRATAMIENTOS
-        // --------------------------------------
-
-        const TratamientoModal = ({ tratamiento, citas, onClose, onSave }) => {
-            const [formData, setFormData] = useState({
-                descripcion: tratamiento?.descripcion_tratamiento || '',
-                medicamento: tratamiento?.nombre_medicamento || '',
-                dosis: tratamiento?.dosis || '',
-                id_cita: tratamiento?.id_cita || ''
-            });
-            const handleChange = (e) => {
-                const { name, value } = e.target;
-                setFormData(prev => ({ ...prev, [name]: value }));
-            };
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                const dataToSave = tratamiento?.id_tratamiento
-                    ? { ...formData, id_tratamiento: tratamiento.id_tratamiento }
-                    : formData;
-                onSave(dataToSave);
-            };
-            return (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{tratamiento ? 'Editar Tratamiento' : 'Añadir Tratamiento'}</h2>
-                        <form onSubmit={handleSubmit}>
-                            <input type="text" name="descripcion" value={formData.descripcion} onChange={handleChange} placeholder="Descripción" className="p-3 border rounded-lg w-full mb-4" required />
-                            <input type="text" name="medicamento" value={formData.medicamento} onChange={handleChange} placeholder="Medicamento" className="p-3 border rounded-lg w-full mb-4" required />
-                            <input type="text" name="dosis" value={formData.dosis} onChange={handleChange} placeholder="Dosis" className="p-3 border rounded-lg w-full mb-4" required />
-                            <select name="id_cita" value={formData.id_cita} onChange={handleChange} className="p-3 border rounded-lg w-full mb-4" required>
-                                <option value="" disabled>Seleccione Cita</option>
-                                {citas.map(cita => (
-                                    <option key={cita.id_cita} value={cita.id_cita}>{cita.fecha} - {cita.nombre_mascota}</option>
-                                ))}
-                            </select>
-                            <div className="flex justify-end space-x-4 mt-8">
-                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg">Cancelar</button>
-                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg">Guardar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            );
-        };
-
-        // ------------------------------------------------
-        // PÁGINA DE GESTIÓN DE TRATAMIENTOS
-        // ------------------------------------------------
-
-        const TratamientosPage = ({ tratamientos, citas, onSave, onDelete }) => {
-            const [isModalOpen, setIsModalOpen] = useState(false);
-            const [editingTratamiento, setEditingTratamiento] = useState(null);
-            const [searchTerm, setSearchTerm] = useState('');
-            const filteredTratamientos = tratamientos.filter(trat =>
-                Object.values(trat).some(value =>
-                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
-                )
-            );
-            return (
-                <div>
-                    {isModalOpen && (
-                        <TratamientoModal
-                            tratamiento={editingTratamiento}
-                            citas={citas}
-                            onClose={() => { setIsModalOpen(false); setEditingTratamiento(null); }}
-                            onSave={onSave}
-                        />
-                    )}
-                    <header className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-800">Gestión de Tratamientos</h1>
-                    </header>
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                            <div className="relative w-full md:w-1/3">
-                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                <input
-                                    type="text"
-                                    placeholder="Buscar tratamiento, medicamento..."
-                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                            <button onClick={() => { setEditingTratamiento(null); setIsModalOpen(true); }} className="bg-orange-500 text-white py-2 px-6 rounded-lg">Añadir Tratamiento</button>
-                        </div>
-                        <table className="w-full text-left">
-                            <thead className="bg-gray-50 border-b">
-                                <tr>
-                                    <th className="p-4">Descripción</th>
-                                    <th className="p-4">Medicamento</th>
-                                    <th className="p-4">Dosis</th>
-                                    <th className="p-4">Cita</th>
-                                    <th className="p-4 text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredTratamientos.map(trat => (
-                                    <tr key={trat.id_tratamiento} className="border-b hover:bg-gray-50">
-                                        <td className="p-4">{trat.descripcion_tratamiento}</td>
-                                        <td className="p-4">{trat.nombre_medicamento}</td>
-                                        <td className="p-4">{trat.dosis}</td>
-                                        <td className="p-4">{trat.fecha} - {trat.nombre_mascota}</td>
-                                        <td className="p-4 text-center">
-                                            <button
-                                                onClick={() => { setEditingTratamiento(trat); setIsModalOpen(true); }}
-                                                className="text-blue-500 hover:text-blue-700 p-2"
-                                                title="Editar"
-                                            >
-                                                <i className="fas fa-edit fa-lg"></i>
-                                            </button>
-                                            <button
-                                                onClick={() => onDelete(trat.id_tratamiento)}
-                                                className="text-red-500 hover:text-red-700 p-2"
-                                                title="Eliminar"
-                                            >
-                                                <i className="fas fa-trash-alt fa-lg"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {filteredTratamientos.length === 0 && (
-                            <div className="text-center py-10 text-gray-500">
-                                <i className="fas fa-pills fa-3x mb-4"></i>
-                                <p className="font-semibold">No se encontraron tratamientos</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-
-        /* NO SIRVE
-        // --------------------------------------
-        // MODAL PARA DETALLE DE FACTURACIÓN
-        // --------------------------------------
-
-        const DetalleFacturaModal = ({ detalle, facturas, servicios, onClose, onSave }) => {
-            const [formData, setFormData] = useState({
-                id_factura: detalle?.id_factura || '',
-                id_servicio: detalle?.id_servicio || '',
-                cantidad_servicio: detalle?.cantidad_servicio || '',
-                subtotal_servicio: detalle?.subtotal_servicio || ''
-            });
-            const handleChange = (e) => {
-                const { name, value } = e.target;
-                setFormData(prev => ({ ...prev, [name]: value }));
-            };
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                const dataToSave = detalle?.id_detalle_factura
-                    ? { ...formData, id_detalle_factura: detalle.id_detalle_factura }
-                    : formData;
-                onSave(dataToSave);
-            };
-
-            return (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{detalle ? 'Editar Detalle' : 'Añadir Detalle'}</h2>
-                        <form onSubmit={handleSubmit}>
-                            <select name="id_factura" value={formData.id_factura} onChange={handleChange} className="p-3 border rounded-lg w-full mb-4" required>
-                                <option value="" disabled>Seleccione Factura</option>
-                                {facturas.map(f => (
-                                    <option key={f.id_factura} value={f.id_factura}>{f.id_factura}</option>
-                                ))}
-                            </select>
-                            <select name="id_servicio" value={formData.id_servicio} onChange={handleChange} className="p-3 border rounded-lg w-full mb-4" required>
-                                <option value="" disabled>Seleccione Servicio</option>
-                                {servicios.map(s => (
-                                    <option key={s.id_servicio} value={s.id_servicio}>{s.nombre_servicio}</option>
-                                ))}
-                            </select>
-                            <input type="number" name="cantidad" value={formData.cantidad} onChange={handleChange} placeholder="Cantidad" className="p-3 border rounded-lg w-full mb-4" required />
-                            <input type="number" name="subtotal" value={formData.subtotal} onChange={handleChange} placeholder="Subtotal" className="p-3 border rounded-lg w-full" required />
-                            <div className="flex justify-end space-x-4 mt-8">
-                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg">Cancelar</button>
-                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg">Guardar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            );
-        };
-
-        // ------------------------------------------------
-        // PÁGINA DE GESTIÓN DE DETALLE DE FACTURACIÓN
-        // ------------------------------------------------
-
-        const DetalleFacturacionPage = ({ detalles, facturas, servicios, onSave, onDelete }) => {
-            const [isModalOpen, setIsModalOpen] = useState(false);
-            const [editingDetalle, setEditingDetalle] = useState(null);
-            const [searchTerm, setSearchTerm] = useState('');
-            const filteredDetalles = detalles.filter(detalle =>
-                Object.values(detalle).some(value =>
-                    String(value).toLowerCase().includes(searchTerm.toLowerCase())
-                )
-            );
-
-            const handleAdd = () => { setEditingDetalle(null); setIsModalOpen(true); };
-            const handleEdit = (detalle) => { setEditingDetalle(detalle); setIsModalOpen(true); };
-            const handleCloseModal = () => { setIsModalOpen(false); setEditingDetalle(null); };
-
-            return (
-                <div>
-                    {isModalOpen && (
-                        <DetalleFacturaModal
-                            detalle={editingDetalle}
-                            facturas={facturas}
-                            servicios={servicios}
-                            onClose={() => { setIsModalOpen(false); setEditingDetalle(null); }}
-                            onSave={onSave}
-                        />
-                    )}
-                    <header className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-800">Detalle de Facturación</h1>
-                    </header>
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                            <div className="relative w-full md:w-1/3">
-                                <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                <input
-                                    type="text"
-                                    placeholder="Buscar detalle, factura, servicio..."
-                                    className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                            <button onClick={() => { setEditingDetalle(null); setIsModalOpen(true); }} className="bg-orange-500 text-white py-2 px-6 rounded-lg">Añadir Detalle</button>
-                        </div>
-                        <table className="w-full text-left">
-                            <thead className="bg-gray-50 border-b">
-                                <tr>
-                                    <th className="p-4">Factura</th>
-                                    <th className="p-4">Servicio</th>
-                                    <th className="p-4">Cantidad</th>
-                                    <th className="p-4">Subtotal</th>
-                                    <th className="p-4 text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredDetalles.map(detalle => (
-                                    <tr key={detalle.id_detalle_factura} className="border-b hover:bg-gray-50">
-                                        <td className="p-4 font-mono text-gray-600">{detalle.id_factura}</td>
-                                        <td className="p-4 font-mono text-gray-600">{detalle.nombre_servicio}</td>
-                                        <td className="p-4 font-mono text-gray-600">{detalle.cantidad_servicio}</td>
-                                        <td className="p-4 font-mono text-gray-600">${detalle.subtotal_servicio}</td>
-                                        <td className="p-4 text-center">
-                                            <button
-                                                onClick={() => handleEdit(detalle.id_detalle_factura)}
-                                                className="text-blue-500 hover:text-blue-700 p-2"
-                                                title="Editar"
-                                            >
-                                                <i className="fas fa-edit fa-lg"></i>
-                                            </button>
-                                            <button
-                                                onClick={() => onDelete(detalle.id_detalle_factura)}
-                                                className="text-red-500 hover:text-red-700 p-2"
-                                                title="Eliminar"
-                                            >
-                                                <i className="fas fa-trash-alt fa-lg"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {filteredDetalles.length === 0 && (
-                            <div className="text-center py-10 text-gray-500">
-                                <i className="fas fa-file-invoice fa-3x mb-4"></i>
-                                <p className="font-semibold">No se encontraron detalles de facturación</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-
-        */
-
-        //-----------------------------------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------------------------------
-
         // --- CONTENEDOR PRINCIPAL DEL DASHBOARD ---
         const DashboardPage = ({ user, onLogout }) => {
             const [activeView, setActiveView] = useState('pets');
@@ -1850,8 +1566,7 @@
                         fetch(`${API_URL}/enfermedades`),
                         fetch(`${API_URL}/enfermedades_mascotas`),
                         fetch(`${API_URL}/servicios`),
-                        fetch(`${API_URL}/tratamientos`),
-                        //fetch(`${API_URL}/detalles_facturas`)
+                        fetch(`${API_URL}/tratamientos`)
                     ]);
                     for (const res of responses) { if (!res.ok) throw new Error('Error al cargar los datos.'); }
                     const [pets, clients, appointments, billing, users, vets, barrios, localidades, enfermedades, enfermedadesMascotas, servicios, tratamientos /*detallesFacturas*/] = await Promise.all(responses.map(res => res.json()));
@@ -1863,9 +1578,49 @@
             useEffect(() => { fetchAllData(); }, [fetchAllData]);
 
             const handleSave = async (endpoint, itemData) => {
-                const isEditing = !!itemData[`id_${endpoint.slice(0, -1)}`];
-                const url = isEditing ? `${API_URL}/${endpoint}/${itemData[`id_${endpoint.slice(0, -1)}`]}` : `${API_URL}/${endpoint}`;
+                console.log(`${endpoint}`)
+                let itemDataid;
+                let isEditing = false;
+
+                // 1. Intentar con endpoint -2 caracteres
+                isEditing = !!itemData[`id_${endpoint.slice(0, -2)}`];
+                if (isEditing) {
+                    itemDataid = itemData[`id_${endpoint.slice(0, -2)}`];
+                } else {
+                    // 2. Intentar con endpoint -1 carácter
+                    isEditing = !!itemData[`id_${endpoint.slice(0, -1)}`];
+                    if (isEditing) {
+                        itemDataid = itemData[`id_${endpoint.slice(0, -1)}`];
+                    } else {
+                        // 3. Intentar con clave original
+                        const keyOriginal = `id_${endpoint}`;
+                        const keySingular = `id_${endpoint.replace(/([a-z]+)es_([a-z]+)s$/, '$1_$2')}`;
+                        console.log(keyOriginal, keySingular);
+
+                        isEditing = !!itemData[keyOriginal];
+                        if (isEditing) {
+                            itemDataid = itemData[keyOriginal];
+                        } else if (keyOriginal !== keySingular) {
+                            // 4. Intentar con clave singularizada si es diferente
+                            isEditing = !!itemData[keySingular];
+                            if (isEditing) {
+                                itemDataid = itemData[keySingular];
+                            } else {
+                                // Ninguna validación pasada, isEditing queda false y itemDataid indefinido
+                                isEditing = false;
+                                itemDataid = undefined;
+                            }
+                        } else {
+                            // keyOriginal === keySingular y no existe
+                            isEditing = false;
+                            itemDataid = undefined;
+                        }
+                    }
+                }
+                console.log(itemData)
+                const url = isEditing ? `${API_URL}/${endpoint}/${itemDataid}` : `${API_URL}/${endpoint}`;
                 const method = isEditing ? 'PUT' : 'POST';
+                console.log(method)
                 try {
                     const response = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(itemData) });
                     if (!response.ok) { const err = await response.json(); throw new Error(err.error || 'Error al guardar.'); }
@@ -1893,12 +1648,10 @@
                     case 'users': return <UsersPage data={data} onSave={(item) => handleSave('usuarios', item)} onDelete={(id) => handleDelete('usuarios', id)} />;
                     case 'vets': return <VetsPage vets={data.vets} usuarios={data.users} onSave={(item) => handleSave('veterinarios', item)} onDelete={(id) => handleDelete('veterinarios', id)} />;
                     case 'barrios': return <BarriosPage barrios={data.barrios} localidades={data.localidades} onSave={(item) => handleSave('barrios', item)} onDelete={(id) => handleDelete('barrios', id)} />;
-                    case 'localidades': return <LocalidadesPage localidades={data.localidades} onSave={(item) => handleSave('localidades', item)} onDelete={(id) => handleDelete('localidades', id)} />;
+                    case 'localidades': return <LocalidadesPage data={data} onSave={(item) => handleSave('localidades', item)} onDelete={(id) => handleDelete('localidades', id)} />;
                     case 'enfermedades': return <EnfermedadesPage enfermedades={data.enfermedades} onSave={(item) => handleSave('enfermedades', item)} onDelete={(id) => handleDelete('enfermedades', id)} />;
                     case 'enfermedadesMascotas': return <EnfermedadesMascotasPage enfermedadesMascotas={data.enfermedadesMascotas} mascotas={data.pets} enfermedades={data.enfermedades} onSave={(item) => handleSave('enfermedades_mascotas', item)} onDelete={(id) => handleDelete('enfermedades_mascotas', id)} />;
                     case 'servicios': return <ServiciosPage servicios={data.servicios} onSave={(item) => handleSave('servicios', item)} onDelete={(id) => handleDelete('servicios', id)} />;
-                    case 'tratamientos': return <TratamientosPage tratamientos={data.tratamientos} onSave={(item) => handleSave('tratamientos', item)} onDelete={(id) => handleDelete('tratamientos', id)} />;
-                    // case 'detallesFacturas': return <DetallesFacturasPage detallesFacturas={data.detallesFacturas} onSave={(item) => handleSave('detalles_facturas', item)} onDelete={(id) => handleDelete('detalles_facturas', id)} />;
                     default: return <PetsPage data={data} />;
                 }
             };
@@ -1922,7 +1675,6 @@
                     <NavLink view="enfermedades" icon="fa-medkit">Enfermedades</NavLink>
                     <NavLink view="enfermedadesMascotas" icon="fa-medkit">Enfermedades de Mascotas</NavLink>
                     <NavLink view="servicios" icon="fa-concierge-bell">Servicios</NavLink>
-                    <NavLink view="tratamientos" icon="fa-user-md">Tratamientos</NavLink>
                     {/* <NavLink view="detallesFacturas" icon="fa-file-invoice">Detalles de Facturación</NavLink> */}
                 </nav><div className="p-4 border-t"><button onClick={onLogout} className="w-full flex items-center p-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg"><i className="fas fa-sign-out-alt w-6"></i><span>Cerrar Sesión</span></button></div></aside>
                 <main className="flex-1 p-8 overflow-y-auto">{renderActiveView()}</main>
