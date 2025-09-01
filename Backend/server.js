@@ -5,12 +5,18 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 // --- Capa seguridad para permitir peticiones a mi api
 const cors = require('cors');
+// --- Para cifrado de contraseñas
+const bcrypt = require('bcryptjs');
+// --- Para autenticación JWT
+const jwt = require('jsonwebtoken');
 
 // --- Configuración inicial ---
 // --- APP(Inicializa) express
 const app = express();
 // --- Define el puerto donde funcionará.
 const PORT = process.env.PORT || 4000;
+// --- Clave secreta para JWT
+const JWT_SECRET = process.env.JWT_SECRET || 'wapoki_secret_key_super_secure_2024';
 
 // --- Middlewares --- 
 app.use(cors());
@@ -64,10 +70,16 @@ app.post('/api/usuarios', async (req, res) => {
         if (!nombre_usuario || !contrasenia || !nombre || !apellido || !email || !telefono || !rol) {
             return res.status(400).json({ error: 'Todos los campos son requeridos' });
         }
+        
+        // Cifrar la contraseña antes de guardarla
+        const hashedPassword = await bcrypt.hash(contrasenia, 10);
+        
         const sql = 'INSERT INTO usuarios (nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        const [result] = await pool.query(sql, [nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol]);
+        const [result] = await pool.query(sql, [nombre_usuario, hashedPassword, nombre, apellido, email, telefono, rol]);
 
-        res.status(201).json({ id_usuario: result.insertId, ...req.body });
+        // No devolver la contraseña en la respuesta
+        const { contrasenia: _, ...userResponse } = req.body;
+        res.status(201).json({ id_usuario: result.insertId, ...userResponse });
     } catch (error) {
         console.error('Error al añadir usuario:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
@@ -110,6 +122,176 @@ app.delete('/api/usuarios/:id', async (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
+
+// ------------------------------
+// --- ENDPOINTS DE AUTENTICACIÓN
+// ------------------------------
+
+// REGISTRO DE USUARIO
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol } = req.body;
+        
+        // Validar campos requeridos
+        if (!nombre_usuario || !contrasenia || !nombre || !apellido || !email || !telefono) {
+            return res.status(400).json({ error: 'Todos los campos son requeridos' });
+        }
+
+        // Verificar si el usuario ya existe
+        const [existingUser] = await pool.query(
+            'SELECT id_usuario FROM usuarios WHERE nombre_usuario = ? OR email = ?', 
+            [nombre_usuario, email]
+        );
+
+        if (existingUser.length > 0) {
+            return res.status(409).json({ error: 'El usuario o email ya existe' });
+        }
+
+        // Cifrar contraseña
+        const hashedPassword = await bcrypt.hash(contrasenia, 10);
+        
+        // Establecer rol por defecto si no se proporciona
+        const userRol = rol || 'cliente';
+
+        // Insertar usuario
+        const sql = 'INSERT INTO usuarios (nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const [result] = await pool.query(sql, [nombre_usuario, hashedPassword, nombre, apellido, email, telefono, userRol]);
+
+        // Generar token JWT con duración muy larga (365 días)
+        const token = jwt.sign(
+            { 
+                id_usuario: result.insertId, 
+                nombre_usuario, 
+                rol: userRol 
+            },
+            JWT_SECRET,
+            { expiresIn: '365d' }
+        );
+
+        res.status(201).json({
+            message: 'Usuario registrado exitosamente',
+            token,
+            user: {
+                id_usuario: result.insertId,
+                nombre_usuario,
+                nombre,
+                apellido,
+                email,
+                telefono,
+                rol: userRol
+            }
+        });
+    } catch (error) {
+        console.error('Error al registrar usuario:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// LOGIN DE USUARIO
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { nombre_usuario, contrasenia } = req.body;
+
+        // Validar campos requeridos
+        if (!nombre_usuario || !contrasenia) {
+            return res.status(400).json({ error: 'Usuario y contraseña son requeridos' });
+        }
+
+        // Buscar usuario
+        const [users] = await pool.query(
+            'SELECT * FROM usuarios WHERE nombre_usuario = ?', 
+            [nombre_usuario]
+        );
+
+        if (users.length === 0) {
+            return res.status(401).json({ error: 'Credenciales inválidas' });
+        }
+
+        const user = users[0];
+
+        // Verificar contraseña
+        const isValidPassword = await bcrypt.compare(contrasenia, user.contrasenia);
+
+        if (!isValidPassword) {
+            return res.status(401).json({ error: 'Credenciales inválidas' });
+        }
+
+        // Generar token JWT con duración muy larga (365 días)
+        const token = jwt.sign(
+            { 
+                id_usuario: user.id_usuario, 
+                nombre_usuario: user.nombre_usuario, 
+                rol: user.rol 
+            },
+            JWT_SECRET,
+            { expiresIn: '365d' }
+        );
+
+        // No devolver la contraseña
+        const { contrasenia: _, ...userResponse } = user;
+
+        res.json({
+            message: 'Login exitoso',
+            token,
+            user: userResponse
+        });
+    } catch (error) {
+        console.error('Error al hacer login:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// VERIFICAR TOKEN
+app.get('/api/auth/verify', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({ error: 'Token no proporcionado' });
+        }
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+        
+        // Verificar que el usuario aún existe
+        const [users] = await pool.query(
+            'SELECT id_usuario, nombre_usuario, nombre, apellido, email, telefono, rol FROM usuarios WHERE id_usuario = ?', 
+            [decoded.id_usuario]
+        );
+
+        if (users.length === 0) {
+            return res.status(401).json({ error: 'Usuario no encontrado' });
+        }
+
+        res.json({
+            valid: true,
+            user: users[0]
+        });
+    } catch (error) {
+        console.error('Error al verificar token:', error);
+        res.status(401).json({ error: 'Token inválido' });
+    }
+});
+
+// ------------------------------
+// --- MIDDLEWARE DE AUTENTICACIÓN
+// ------------------------------
+
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'Token de acceso requerido' });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ error: 'Token inválido' });
+        }
+        req.user = user;
+        next();
+    });
+};
 
 // ------------------------------
 // --- CRUD para veterinarios ✔

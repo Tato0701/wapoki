@@ -1724,20 +1724,346 @@
                 </footer>
             </div>);
         };
-        const LoginPage = ({ onLogin, onNavigate }) => { return <div className="min-h-screen flex items-center justify-center bg-orange-50 p-4"><div className="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 lg:p-12 fade-in"><div className="text-center mb-8"><img src="Imagenes/logo_fondo_claro.png" alt="Logo Wapoki" className="h-20 w-20 rounded-full mx-auto mb-4" /><h1 className="text-3xl font-bold text-gray-800">Bienvenido de Nuevo</h1><p className="text-gray-500 mt-2">Inicia sesión para gestionar la clínica.</p></div><form onSubmit={(e) => { e.preventDefault(); onLogin({ name: 'Dr. Pulido' }); }} className="space-y-6"><div><label className="text-sm font-semibold text-gray-600">Email</label><input type="email" className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" placeholder="tu@email.com" required /></div><div><label className="text-sm font-semibold text-gray-600">Contraseña</label><input type="password" className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" placeholder="********" required /></div><button type="submit" className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors text-lg">Iniciar Sesión</button></form><p className="text-center text-sm text-gray-500 mt-8">¿No tienes cuenta? <button onClick={() => onNavigate('register')} className="font-semibold text-orange-500 hover:underline">Regístrate aquí</button></p><p className="text-center text-sm text-gray-500 mt-2"><button onClick={() => onNavigate('landing')} className="hover:underline">Volver al inicio</button></p></div></div>; };
-        const RegisterPage = ({ onRegister, onNavigate }) => { return <div className="min-h-screen flex items-center justify-center bg-orange-50 p-4"><div className="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 lg:p-12 fade-in"><div className="text-center mb-8"><img src="Imagenes/logo_fondo_claro.png" alt="Logo Wapoki" className="h-20 w-20 rounded-full mx-auto mb-4" /><h1 className="text-3xl font-bold text-gray-800">Crea tu Cuenta</h1><p className="text-gray-500 mt-2">Únete a la plataforma Wapoki.</p></div><form onSubmit={(e) => { e.preventDefault(); onRegister({ name: 'Nuevo Usuario' }); }} className="space-y-6"><div><label className="text-sm font-semibold text-gray-600">Nombre Completo</label><input type="text" className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" placeholder="Tu Nombre" required /></div><div><label className="text-sm font-semibold text-gray-600">Email</label><input type="email" className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" placeholder="tu@email.com" required /></div><div><label className="text-sm font-semibold text-gray-600">Contraseña</label><input type="password" className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" placeholder="Crea una contraseña segura" required /></div><button type="submit" className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors text-lg">Registrarse</button></form><p className="text-center text-sm text-gray-500 mt-8">¿Ya tienes una cuenta? <button onClick={() => onNavigate('login')} className="font-semibold text-orange-500 hover:underline">Inicia sesión</button></p><p className="text-center text-sm text-gray-500 mt-2"><button onClick={() => onNavigate('landing')} className="hover:underline">Volver al inicio</button></p></div></div>; };
+        const LoginPage = ({ onLogin, onNavigate }) => {
+            const [formData, setFormData] = useState({
+                nombre_usuario: '',
+                contrasenia: ''
+            });
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+                setError(''); // Limpiar error al escribir
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                setError('');
+
+                try {
+                    const response = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Guardar el token en localStorage
+                        localStorage.setItem('wapokiToken', data.token);
+                        onLogin(data.user);
+                    } else {
+                        setError(data.error || 'Error al iniciar sesión');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    setError('Error de conexión. Intenta de nuevo.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-orange-50 p-4">
+                    <div className="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 lg:p-12 fade-in">
+                        <div className="text-center mb-8">
+                            <img src="Imagenes/logo_fondo_claro.png" alt="Logo Wapoki" className="h-20 w-20 rounded-full mx-auto mb-4" />
+                            <h1 className="text-3xl font-bold text-gray-800">Bienvenido de Nuevo</h1>
+                            <p className="text-gray-500 mt-2">Inicia sesión para gestionar la clínica.</p>
+                        </div>
+                        
+                        {error && (
+                            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                                {error}
+                            </div>
+                        )}
+                        
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label className="text-sm font-semibold text-gray-600">Usuario</label>
+                                <input 
+                                    type="text" 
+                                    name="nombre_usuario"
+                                    value={formData.nombre_usuario}
+                                    onChange={handleChange}
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
+                                    placeholder="Nombre de usuario" 
+                                    required 
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-semibold text-gray-600">Contraseña</label>
+                                <input 
+                                    type="password" 
+                                    name="contrasenia"
+                                    value={formData.contrasenia}
+                                    onChange={handleChange}
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
+                                    placeholder="********" 
+                                    required 
+                                />
+                            </div>
+                            <button 
+                                type="submit" 
+                                disabled={loading}
+                                className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors text-lg disabled:opacity-50"
+                            >
+                                {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                            </button>
+                        </form>
+                        <p className="text-center text-sm text-gray-500 mt-8">
+                            ¿No tienes cuenta? 
+                            <button onClick={() => onNavigate('register')} className="font-semibold text-orange-500 hover:underline ml-1">
+                                Regístrate aquí
+                            </button>
+                        </p>
+                        <p className="text-center text-sm text-gray-500 mt-2">
+                            <button onClick={() => onNavigate('landing')} className="hover:underline">
+                                Volver al inicio
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            );
+        };
+        const RegisterPage = ({ onRegister, onNavigate }) => {
+            const [formData, setFormData] = useState({
+                nombre_usuario: '',
+                contrasenia: '',
+                confirmarContrasenia: '',
+                nombre: '',
+                apellido: '',
+                email: '',
+                telefono: '',
+                rol: 'cliente'
+            });
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+                setError(''); // Limpiar error al escribir
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                setError('');
+
+                // Validar que las contraseñas coincidan
+                if (formData.contrasenia !== formData.confirmarContrasenia) {
+                    setError('Las contraseñas no coinciden');
+                    setLoading(false);
+                    return;
+                }
+
+                // Validar longitud de contraseña
+                if (formData.contrasenia.length < 6) {
+                    setError('La contraseña debe tener al menos 6 caracteres');
+                    setLoading(false);
+                    return;
+                }
+
+                try {
+                    const { confirmarContrasenia, ...dataToSend } = formData;
+                    
+                    const response = await fetch(`${API_URL}/auth/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dataToSend),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Guardar el token en localStorage
+                        localStorage.setItem('wapokiToken', data.token);
+                        onRegister(data.user);
+                    } else {
+                        setError(data.error || 'Error al registrar usuario');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    setError('Error de conexión. Intenta de nuevo.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-orange-50 p-4">
+                    <div className="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 lg:p-12 fade-in">
+                        <div className="text-center mb-8">
+                            <img src="Imagenes/logo_fondo_claro.png" alt="Logo Wapoki" className="h-20 w-20 rounded-full mx-auto mb-4" />
+                            <h1 className="text-3xl font-bold text-gray-800">Crea tu Cuenta</h1>
+                            <p className="text-gray-500 mt-2">Únete a la plataforma Wapoki.</p>
+                        </div>
+                        
+                        {error && (
+                            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                                {error}
+                            </div>
+                        )}
+                        
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-sm font-semibold text-gray-600">Nombre</label>
+                                    <input 
+                                        type="text" 
+                                        name="nombre"
+                                        value={formData.nombre}
+                                        onChange={handleChange}
+                                        className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
+                                        placeholder="Tu nombre" 
+                                        required 
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-semibold text-gray-600">Apellido</label>
+                                    <input 
+                                        type="text" 
+                                        name="apellido"
+                                        value={formData.apellido}
+                                        onChange={handleChange}
+                                        className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
+                                        placeholder="Tu apellido" 
+                                        required 
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-sm font-semibold text-gray-600">Usuario</label>
+                                <input 
+                                    type="text" 
+                                    name="nombre_usuario"
+                                    value={formData.nombre_usuario}
+                                    onChange={handleChange}
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
+                                    placeholder="Nombre de usuario" 
+                                    required 
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-semibold text-gray-600">Email</label>
+                                <input 
+                                    type="email" 
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
+                                    placeholder="tu@email.com" 
+                                    required 
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-semibold text-gray-600">Teléfono</label>
+                                <input 
+                                    type="tel" 
+                                    name="telefono"
+                                    value={formData.telefono}
+                                    onChange={handleChange}
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
+                                    placeholder="Número de teléfono" 
+                                    required 
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-semibold text-gray-600">Contraseña</label>
+                                <input 
+                                    type="password" 
+                                    name="contrasenia"
+                                    value={formData.contrasenia}
+                                    onChange={handleChange}
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
+                                    placeholder="Mínimo 6 caracteres" 
+                                    required 
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-semibold text-gray-600">Confirmar Contraseña</label>
+                                <input 
+                                    type="password" 
+                                    name="confirmarContrasenia"
+                                    value={formData.confirmarContrasenia}
+                                    onChange={handleChange}
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
+                                    placeholder="Repite tu contraseña" 
+                                    required 
+                                />
+                            </div>
+                            <button 
+                                type="submit" 
+                                disabled={loading}
+                                className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors text-lg disabled:opacity-50"
+                            >
+                                {loading ? 'Registrando...' : 'Registrarse'}
+                            </button>
+                        </form>
+                        <p className="text-center text-sm text-gray-500 mt-6">
+                            ¿Ya tienes una cuenta? 
+                            <button onClick={() => onNavigate('login')} className="font-semibold text-orange-500 hover:underline ml-1">
+                                Inicia sesión
+                            </button>
+                        </p>
+                        <p className="text-center text-sm text-gray-500 mt-2">
+                            <button onClick={() => onNavigate('landing')} className="hover:underline">
+                                Volver al inicio
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            );
+        };
 
         // --- COMPONENTE PRINCIPAL DE LA APP ---
         const App = () => {
-            // Recupera el usuario guardado en localStorage al iniciar la app
-            const [user, setUser] = useState(() => {
-                const saved = localStorage.getItem('wapokiUser');
-                return saved ? JSON.parse(saved) : null;
-            });
-            const [currentPage, setCurrentPage] = useState(() => {
-                const saved = localStorage.getItem('wapokiUser');
-                return saved ? 'dashboard' : 'landing';
-            });
+            const [user, setUser] = useState(null);
+            const [currentPage, setCurrentPage] = useState('landing');
+            const [loading, setLoading] = useState(true);
+
+            // Verificar token al cargar la aplicación
+            useEffect(() => {
+                const verifyToken = async () => {
+                    const token = localStorage.getItem('wapokiToken');
+                    if (token) {
+                        try {
+                            const response = await fetch(`${API_URL}/auth/verify`, {
+                                method: 'GET',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                },
+                            });
+
+                            if (response.ok) {
+                                const data = await response.json();
+                                setUser(data.user);
+                                setCurrentPage('dashboard');
+                            } else {
+                                // Token inválido, remover del localStorage
+                                localStorage.removeItem('wapokiToken');
+                                localStorage.removeItem('wapokiUser');
+                            }
+                        } catch (error) {
+                            console.error('Error verificando token:', error);
+                            localStorage.removeItem('wapokiToken');
+                            localStorage.removeItem('wapokiUser');
+                        }
+                    }
+                    setLoading(false);
+                };
+
+                verifyToken();
+            }, []);
 
             // Guarda el usuario en localStorage al iniciar sesión
             const handleLogin = (userData) => {
@@ -1746,10 +2072,11 @@
                 setCurrentPage('dashboard');
             };
 
-            // Borra el usuario de localStorage al cerrar sesión
+            // Borra el usuario y token de localStorage al cerrar sesión
             const handleLogout = () => {
                 setUser(null);
                 localStorage.removeItem('wapokiUser');
+                localStorage.removeItem('wapokiToken');
                 setCurrentPage('landing');
             };
 
@@ -1759,6 +2086,18 @@
                 localStorage.setItem('wapokiUser', JSON.stringify(userData));
                 setCurrentPage('dashboard');
             };
+
+            // Mostrar loading mientras se verifica el token
+            if (loading) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center bg-orange-50">
+                        <div className="text-center">
+                            <img src="Imagenes/logo_fondo_claro.png" alt="Logo Wapoki" className="h-20 w-20 rounded-full mx-auto mb-4 animate-pulse" />
+                            <p className="text-gray-600">Cargando...</p>
+                        </div>
+                    </div>
+                );
+            }
 
             const renderPage = () => {
                 switch (currentPage) {
