@@ -130,6 +130,7 @@ app.delete('/api/usuarios/:id', async (req, res) => {
 // REGISTRO DE USUARIO
 app.post('/api/auth/register', async (req, res) => {
     try {
+        console.log('Registro de usuario:', req.body);
         const { nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol } = req.body;
         
         // Validar campos requeridos
@@ -146,16 +147,17 @@ app.post('/api/auth/register', async (req, res) => {
         if (existingUser.length > 0) {
             return res.status(409).json({ error: 'El usuario o email ya existe' });
         }
-
+        console.log('Usuario registrado:', { nombre_usuario, email });
         // Cifrar contraseña
         const hashedPassword = await bcrypt.hash(contrasenia, 10);
+        console.log('Usuario prueba:', { nombre_usuario, email });
         
         // Establecer rol por defecto si no se proporciona
         const userRol = rol || 'cliente';
 
         // Insertar usuario
-        const sql = 'INSERT INTO usuarios (nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        const [result] = await pool.query(sql, [nombre_usuario, hashedPassword, nombre, apellido, email, telefono, userRol]);
+        const sql = 'INSERT INTO usuarios (nombre_usuario, contrasenia, nombre, apellido, email, telefono, rol, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+        const [result] = await pool.query(sql, [nombre_usuario, hashedPassword, nombre, apellido, email, telefono, userRol, 1]);
 
         // Generar token JWT con duración muy larga (365 días)
         const token = jwt.sign(
@@ -182,8 +184,9 @@ app.post('/api/auth/register', async (req, res) => {
             }
         });
     } catch (error) {
+        console.log('Error en el registro de usuario:', error);
         console.error('Error al registrar usuario:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+        res.status(500).json({ error: error.message || 'Error interno del servidor' });
     }
 });
 

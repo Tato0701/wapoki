@@ -168,9 +168,8 @@
         // MODAL PARA CLIENTES ✔
         // ----------------------------
 
-        const ClientModal = ({ client, onClose, onSave }) => {
-            const [formData, setFormData] = useState(client ||
-            {
+        const ClientModal = ({ client, barrios, onClose, onSave }) => {
+            const [formData, setFormData] = useState(client || {
                 nombre: '',
                 apellido: '',
                 telefono: '',
@@ -178,10 +177,12 @@
                 direccion: '',
                 id_barrio: ''
             });
+
             const handleChange = (e) => {
                 const { name, value } = e.target;
                 setFormData(prev => ({ ...prev, [name]: value }));
             };
+
             const handleSubmit = (e) => {
                 e.preventDefault();
                 const dataToSave = client?.id_cliente
@@ -189,6 +190,7 @@
                     : formData;
                 onSave(dataToSave);
             };
+
             return (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
                     <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
@@ -197,10 +199,23 @@
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
                                 <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Apellido" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
-                                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" />
-                                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" />
-                                <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Dirección" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" />
-                                <input type="number" name="id_barrio" value={formData.id_barrio} onChange={handleChange} placeholder="Barrio" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+                                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Dirección" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <select
+                                    name="id_barrio"
+                                    value={formData.id_barrio}
+                                    onChange={handleChange}
+                                    className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white"
+                                    required
+                                >
+                                    <option value="" disabled>Seleccione un Barrio</option>
+                                    {barrios.map(barrio => (
+                                        <option key={barrio.id_barrio} value={barrio.id_barrio}>
+                                            {barrio.nombre_barrio}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="flex justify-end space-x-4 mt-8">
                                 <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancelar</button>
@@ -231,6 +246,7 @@
                     {isModalOpen &&
                         <ClientModal
                             client={editingClient}
+                            barrios={data.barrios}
                             onClose={() => { setIsModalOpen(false); setEditingClient(null); }}
                             onSave={onSave}
                         />
@@ -466,11 +482,11 @@
 
         const VetModal = ({ vet, usuarios, onClose, onSave }) => {
             const [formData, setFormData] = useState({
-                nombre: vet?.nombre || '',
-                apellido: vet?.apellido || '',
-                especialidad: vet?.especialidad || '',
-                telefono: vet?.telefono || '',
-                email: vet?.email || '',
+                nombre: vet?.nombre_veterinario || '',
+                apellido: vet?.apellido_veterinario || '',
+                especialidad: vet?.especialidad_veterinario || '',
+                telefono: vet?.telefono_veterinario || '',
+                email: vet?.email_veterinario || '',
                 id_usuario: vet?.id_usuario || ''
             });
 
@@ -490,16 +506,64 @@
             return (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
                     <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">{vet ? 'Editar Veterinario' : 'Añadir Nuevo Veterinario'}</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                            {vet ? 'Editar Veterinario' : 'Añadir Nuevo Veterinario'}
+                        </h2>
                         <form onSubmit={handleSubmit}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 border rounded-lg" required />
-                                <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Apellido" className="p-3 border rounded-lg" required />
-                                <input type="text" name="especialidad" value={formData.especialidad} onChange={handleChange} placeholder="Especialidad" className="p-3 border rounded-lg" required />
-                                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 border rounded-lg" required />
-                                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="p-3 border rounded-lg" required />
-                                <select name="id_usuario" value={formData.id_usuario} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2" required>
-                                    <option value="" disabled> Seleccione un Usuario </option>
+                                <input
+                                    type="text"
+                                    name="nombre"
+                                    value={formData.nombre}
+                                    onChange={handleChange}
+                                    placeholder="Nombre"
+                                    className="p-3 border rounded-lg"
+                                    required
+                                />
+                                <input
+                                    type="text"
+                                    name="apellido"
+                                    value={formData.apellido}
+                                    onChange={handleChange}
+                                    placeholder="Apellido"
+                                    className="p-3 border rounded-lg"
+                                    required
+                                />
+                                <input
+                                    type="text"
+                                    name="especialidad"
+                                    value={formData.especialidad}
+                                    onChange={handleChange}
+                                    placeholder="Especialidad"
+                                    className="p-3 border rounded-lg"
+                                    required
+                                />
+                                <input
+                                    type="tel"
+                                    name="telefono"
+                                    value={formData.telefono}
+                                    onChange={handleChange}
+                                    placeholder="Teléfono"
+                                    className="p-3 border rounded-lg"
+                                    required
+                                />
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    placeholder="Email"
+                                    className="p-3 border rounded-lg"
+                                    required
+                                />
+                                <select
+                                    name="id_usuario"
+                                    value={formData.id_usuario}
+                                    onChange={handleChange}
+                                    className="p-3 border rounded-lg md:col-span-2"
+                                    required
+                                >
+                                    <option value="" disabled>Seleccione un Usuario</option>
                                     {usuarios.map(usuario => (
                                         <option key={usuario.id_usuario} value={usuario.id_usuario}>
                                             {usuario.nombre_usuario}
@@ -508,8 +572,19 @@
                                 </select>
                             </div>
                             <div className="flex justify-end space-x-4 mt-8">
-                                <button type="button" onClick={onClose} className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Cancelar</button>
-                                <button type="submit" className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600">Guardar</button>
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="py-2 px-6 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="py-2 px-6 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                                >
+                                    Guardar
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -622,18 +697,19 @@
         // ----------------------------
 
         const AppointmentModal = ({ appointment, pets, vets, onClose, onSave }) => {
-            const [formData, setFormData] = useState(
-                {
-                    fecha: appointment?.fecha ? new Date(appointment.fecha).toISOString().split('T')[0] : '',
-                    hora: appointment?.hora || '',
-                    id_mascota: appointment?.id_mascota || '',
-                    id_veterinario: appointment?.id_veterinario || '',
-                    motivo: appointment?.motivo || '',
-                });
+            const [formData, setFormData] = useState({
+                fecha: appointment?.fecha ? new Date(appointment.fecha).toISOString().split('T')[0] : '',
+                hora: appointment?.hora || '',
+                id_mascota: appointment?.id_mascota || '',
+                id_veterinario: appointment?.id_veterinario || '',
+                motivo: appointment?.motivo || ''
+            });
+
             const handleChange = (e) => {
                 const { name, value } = e.target;
                 setFormData(prev => ({ ...prev, [name]: value }));
             };
+
             const handleSubmit = (e) => {
                 e.preventDefault();
                 const dataToSave = appointment?.id_cita
@@ -641,6 +717,7 @@
                     : formData;
                 onSave(dataToSave);
             };
+
             return (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
                     <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg fade-in">
@@ -650,14 +727,27 @@
                                 <input type="date" name="fecha" value={formData.fecha} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
                                 <input type="time" name="hora" value={formData.hora} onChange={handleChange} className="p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
                                 <select name="id_mascota" value={formData.id_mascota} onChange={handleChange} className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white" required>
-                                    <option value="" disabled> Seleccione una Mascota </option>
+                                    <option value="" disabled>Seleccione una Mascota</option>
                                     {pets.map(pet => (
                                         <option key={pet.id_mascota} value={pet.id_mascota}>
                                             {pet.nombre} ({pet.nombre_cliente})
                                         </option>
                                     ))}
                                 </select>
-                                <input type="number" name="id_veterinario" value={formData.id_veterinario} onChange={handleChange} placeholder="ID del Veterinario" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" required />
+                                <select
+                                    name="id_veterinario"
+                                    value={formData.id_veterinario}
+                                    onChange={handleChange}
+                                    className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white"
+                                    required
+                                >
+                                    <option value="" disabled>Seleccione un Veterinario</option>
+                                    {vets.map(vet => (
+                                        <option key={vet.id_veterinario} value={vet.id_veterinario}>
+                                            {vet.nombre_veterinario} {vet.apellido_veterinario} - {vet.especialidad_veterinario}
+                                        </option>
+                                    ))}
+                                </select>
                                 <textarea name="motivo" value={formData.motivo} onChange={handleChange} placeholder="Motivo de la consulta" className="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-orange-400 focus:outline-none" rows="3" required></textarea>
                             </div>
                             <div className="flex justify-end space-x-4 mt-8">
@@ -687,6 +777,7 @@
                             appointment={editingAppointment}
                             pets={pets}
                             vets={vets}
+                            Vets={data.vets}
                             onClose={() => { setIsModalOpen(false); setEditingAppointment(null); }}
                             onSave={onSave}
                         />
@@ -1777,40 +1868,40 @@
                             <h1 className="text-3xl font-bold text-gray-800">Bienvenido de Nuevo</h1>
                             <p className="text-gray-500 mt-2">Inicia sesión para gestionar la clínica.</p>
                         </div>
-                        
+
                         {error && (
                             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
                                 {error}
                             </div>
                         )}
-                        
+
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
                                 <label className="text-sm font-semibold text-gray-600">Usuario</label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     name="nombre_usuario"
                                     value={formData.nombre_usuario}
                                     onChange={handleChange}
-                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
-                                    placeholder="Nombre de usuario" 
-                                    required 
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    placeholder="Nombre de usuario"
+                                    required
                                 />
                             </div>
                             <div>
                                 <label className="text-sm font-semibold text-gray-600">Contraseña</label>
-                                <input 
-                                    type="password" 
+                                <input
+                                    type="password"
                                     name="contrasenia"
                                     value={formData.contrasenia}
                                     onChange={handleChange}
-                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
-                                    placeholder="********" 
-                                    required 
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    placeholder="********"
+                                    required
                                 />
                             </div>
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 disabled={loading}
                                 className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors text-lg disabled:opacity-50"
                             >
@@ -1818,7 +1909,7 @@
                             </button>
                         </form>
                         <p className="text-center text-sm text-gray-500 mt-8">
-                            ¿No tienes cuenta? 
+                            ¿No tienes cuenta?
                             <button onClick={() => onNavigate('register')} className="font-semibold text-orange-500 hover:underline ml-1">
                                 Regístrate aquí
                             </button>
@@ -1841,7 +1932,7 @@
                 apellido: '',
                 email: '',
                 telefono: '',
-                rol: 'cliente'
+                rol: ''
             });
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState('');
@@ -1873,7 +1964,7 @@
 
                 try {
                     const { confirmarContrasenia, ...dataToSend } = formData;
-                    
+
                     const response = await fetch(`${API_URL}/auth/register`, {
                         method: 'POST',
                         headers: {
@@ -1907,102 +1998,118 @@
                             <h1 className="text-3xl font-bold text-gray-800">Crea tu Cuenta</h1>
                             <p className="text-gray-500 mt-2">Únete a la plataforma Wapoki.</p>
                         </div>
-                        
+
                         {error && (
                             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
                                 {error}
                             </div>
                         )}
-                        
+
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="text-sm font-semibold text-gray-600">Nombre</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         name="nombre"
                                         value={formData.nombre}
                                         onChange={handleChange}
-                                        className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
-                                        placeholder="Tu nombre" 
-                                        required 
+                                        className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                        placeholder="Tu nombre"
+                                        required
                                     />
                                 </div>
                                 <div>
                                     <label className="text-sm font-semibold text-gray-600">Apellido</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         name="apellido"
                                         value={formData.apellido}
                                         onChange={handleChange}
-                                        className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
-                                        placeholder="Tu apellido" 
-                                        required 
+                                        className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                        placeholder="Tu apellido"
+                                        required
                                     />
                                 </div>
                             </div>
                             <div>
                                 <label className="text-sm font-semibold text-gray-600">Usuario</label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     name="nombre_usuario"
                                     value={formData.nombre_usuario}
                                     onChange={handleChange}
-                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
-                                    placeholder="Nombre de usuario" 
-                                    required 
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    placeholder="Nombre de usuario"
+                                    required
                                 />
                             </div>
                             <div>
                                 <label className="text-sm font-semibold text-gray-600">Email</label>
-                                <input 
-                                    type="email" 
+                                <input
+                                    type="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
-                                    placeholder="tu@email.com" 
-                                    required 
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    placeholder="tu@email.com"
+                                    required
                                 />
                             </div>
                             <div>
                                 <label className="text-sm font-semibold text-gray-600">Teléfono</label>
-                                <input 
-                                    type="tel" 
+                                <input
+                                    type="tel"
                                     name="telefono"
                                     value={formData.telefono}
                                     onChange={handleChange}
-                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
-                                    placeholder="Número de teléfono" 
-                                    required 
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    placeholder="Número de teléfono"
+                                    required
                                 />
                             </div>
                             <div>
+                                <label className="text-sm font-semibold text-gray-600">Rol</label>
+                                <select
+                                    name="rol"
+                                    value={formData.rol}
+                                    onChange={handleChange}
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none bg-white"
+                                    required
+                                >
+                                    <option value="" disabled>Seleccione un Rol</option>
+                                    <option value="Administrador">Administrador</option>
+                                    <option value="Veterinario">Veterinario</option>
+                                    <option value="Secretaria">Secretaria</option>
+                                    <option value="Empleado">Empleado</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label className="text-sm font-semibold text-gray-600">Contraseña</label>
-                                <input 
-                                    type="password" 
+                                <input
+                                    type="password"
                                     name="contrasenia"
                                     value={formData.contrasenia}
                                     onChange={handleChange}
-                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
-                                    placeholder="Mínimo 6 caracteres" 
-                                    required 
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    placeholder="Mínimo 6 caracteres"
+                                    required
                                 />
                             </div>
                             <div>
                                 <label className="text-sm font-semibold text-gray-600">Confirmar Contraseña</label>
-                                <input 
-                                    type="password" 
+                                <input
+                                    type="password"
                                     name="confirmarContrasenia"
                                     value={formData.confirmarContrasenia}
                                     onChange={handleChange}
-                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none" 
-                                    placeholder="Repite tu contraseña" 
-                                    required 
+                                    className="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
+                                    placeholder="Repite tu contraseña"
+                                    required
                                 />
                             </div>
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 disabled={loading}
                                 className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors text-lg disabled:opacity-50"
                             >
@@ -2010,7 +2117,7 @@
                             </button>
                         </form>
                         <p className="text-center text-sm text-gray-500 mt-6">
-                            ¿Ya tienes una cuenta? 
+                            ¿Ya tienes una cuenta?
                             <button onClick={() => onNavigate('login')} className="font-semibold text-orange-500 hover:underline ml-1">
                                 Inicia sesión
                             </button>
